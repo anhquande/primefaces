@@ -23,10 +23,12 @@ PrimeFaces.widget.Tooltip = PrimeFaces.widget.BaseWidget.extend({
         this.removeScriptElement(this.id);
     },
 
+    //@override
     refresh: function(cfg) {
         if(cfg.target) {
-            if($(PrimeFaces.escapeClientId(cfg.id)).length > 1)
-                $(document.body).children(PrimeFaces.escapeClientId(cfg.id)).remove();
+            var targetTooltip = $(document.body).children(PrimeFaces.escapeClientId(cfg.id));
+            if(targetTooltip.length)
+                targetTooltip.remove();
         }
         else {
             $(document.body).children('.ui-tooltip-global').remove();
@@ -60,8 +62,14 @@ PrimeFaces.widget.Tooltip = PrimeFaces.widget.BaseWidget.extend({
                             element.data('tooltip', title).removeAttr('title');
                         }
 
+                        var arrow = $this.jq.children('.ui-tooltip-arrow');
+
                         if(element.hasClass('ui-state-error')) {
                             $this.jq.children('.ui-tooltip-text').addClass('ui-state-error');
+                            arrow.addClass('ui-state-error');
+                        }
+                        else {
+                            arrow.removeClass('ui-state-error');
                         }
 
                         var text = element.data('tooltip');
@@ -81,16 +89,14 @@ PrimeFaces.widget.Tooltip = PrimeFaces.widget.BaseWidget.extend({
                             $this.hide();
                             $this.globalTitle = null;
                             $this.target = null;
-                            $this.jq.removeClass('ui-state-error');
+                            $this.jq.children('.ui-tooltip-text').removeClass('ui-state-error');
                         }
                     });
 
-        var resizeNS = 'resize.tooltip';
-        $(window).unbind(resizeNS).bind(resizeNS, function() {
-            if($this.jq.is(':visible')) {
-                $this.align();
-            }
+        PrimeFaces.utils.registerResizeHandler(this, 'resize.tooltip' + '_align', $this.jq, function() {
+            $this.align();
         });
+
     },
 
     bindTarget: function() {
@@ -100,19 +106,38 @@ PrimeFaces.widget.Tooltip = PrimeFaces.widget.BaseWidget.extend({
         this.target = PrimeFaces.expressions.SearchExpressionFacade.resolveComponentsAsSelector(this.cfg.target);
 
         var $this = this;
-        this.target.off(this.cfg.showEvent + ' ' + this.cfg.hideEvent)
-                    .on(this.cfg.showEvent, function(e) {
-                        if($this.cfg.trackMouse) {
-                            $this.mouseEvent = e;
-                        }
+        if(this.cfg.delegate) {
+            var targetSelector = "*[id='" + this.target.attr('id') + "']";
 
-                        if($.trim($this.jq.children('.ui-tooltip-text').html()) !== '') {
-                            $this.show();
-                        }
-                    })
-                    .on(this.cfg.hideEvent + '.tooltip', function() {
-                        $this.hide();
-                    });
+            $(document).off(this.cfg.showEvent + ' ' + this.cfg.hideEvent, targetSelector)
+                        .on(this.cfg.showEvent, targetSelector, function(e) {
+                            if($this.cfg.trackMouse) {
+                                $this.mouseEvent = e;
+                            }
+
+                            if($.trim($this.jq.children('.ui-tooltip-text').html()) !== '') {
+                                $this.show();
+                            }
+                        })
+                        .on(this.cfg.hideEvent + '.tooltip', function() {
+                            $this.hide();
+                        });
+        }
+        else {
+            this.target.off(this.cfg.showEvent + ' ' + this.cfg.hideEvent)
+                        .on(this.cfg.showEvent, function(e) {
+                            if($this.cfg.trackMouse) {
+                                $this.mouseEvent = e;
+                            }
+
+                            if($.trim($this.jq.children('.ui-tooltip-text').html()) !== '') {
+                                $this.show();
+                            }
+                        })
+                        .on(this.cfg.hideEvent + '.tooltip', function() {
+                            $this.hide();
+                        });
+        }
 
         this.jq.appendTo(document.body);
 
@@ -122,11 +147,9 @@ PrimeFaces.widget.Tooltip = PrimeFaces.widget.BaseWidget.extend({
 
         this.target.removeAttr('title');
 
-        var resizeNS = 'resize.' + this.id;
-        $(window).unbind(resizeNS).bind(resizeNS, function() {
-            if($this.jq.is(':visible')) {
-                $this.align();
-            }
+
+        PrimeFaces.utils.registerResizeHandler(this, 'resize.' + this.id + '_align', $this.jq, function() {
+            $this.align();
         });
     },
 
@@ -199,7 +222,7 @@ PrimeFaces.widget.Tooltip = PrimeFaces.widget.BaseWidget.extend({
             this.jq.position({
                 my: _my,
                 at: _at,
-                of: this.target,
+                of: this.getTarget(),
                 collision: 'flipfit',
                 using: function(p,f) {
                     $this.alignUsing.call($this,p,f);
@@ -209,7 +232,7 @@ PrimeFaces.widget.Tooltip = PrimeFaces.widget.BaseWidget.extend({
     },
 
     show: function() {
-        if(this.target) {
+        if(this.getTarget()) {
             var $this = this;
             this.clearTimeout();
 
@@ -280,7 +303,7 @@ PrimeFaces.widget.Tooltip = PrimeFaces.widget.BaseWidget.extend({
     followMouse: function() {
         var $this = this;
 
-        this.target.on('mousemove.tooltip-track', function(e) {
+        this.getTarget().on('mousemove.tooltip-track', function(e) {
             $this.jq.position({
                 my: 'left top+15',
                 at: 'right bottom',
@@ -291,13 +314,21 @@ PrimeFaces.widget.Tooltip = PrimeFaces.widget.BaseWidget.extend({
     },
 
     unfollowMouse: function() {
-        if (this.target) {
-            this.target.off('mousemove.tooltip-track');
+        var target = this.getTarget();
+        if(target) {
+            target.off('mousemove.tooltip-track');
         }
     },
 
     isVisible: function() {
         return this.jq.is(':visible');
+    },
+
+    getTarget: function() {
+        if(this.cfg.delegate)
+            return PrimeFaces.expressions.SearchExpressionFacade.resolveComponentsAsSelector(this.cfg.target);
+        else
+            return this.target;
     }
 
 });

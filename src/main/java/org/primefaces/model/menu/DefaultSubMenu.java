@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,14 +45,17 @@ public class DefaultSubMenu implements Submenu, Serializable {
         elements = new ArrayList<MenuElement>();
     }
 
+    @Override
     public String getId() {
         return id;
     }
 
+    @Override
     public void setId(String id) {
         this.id = id;
     }
 
+    @Override
     public String getStyle() {
         return style;
     }
@@ -61,6 +64,7 @@ public class DefaultSubMenu implements Submenu, Serializable {
         this.style = style;
     }
 
+    @Override
     public String getStyleClass() {
         return styleClass;
     }
@@ -69,6 +73,7 @@ public class DefaultSubMenu implements Submenu, Serializable {
         this.styleClass = styleClass;
     }
 
+    @Override
     public String getIcon() {
         return icon;
     }
@@ -77,6 +82,7 @@ public class DefaultSubMenu implements Submenu, Serializable {
         this.icon = icon;
     }
 
+    @Override
     public String getLabel() {
         return label;
     }
@@ -85,6 +91,7 @@ public class DefaultSubMenu implements Submenu, Serializable {
         this.label = label;
     }
 
+    @Override
     public List<MenuElement> getElements() {
         return elements;
     }
@@ -93,10 +100,12 @@ public class DefaultSubMenu implements Submenu, Serializable {
         this.elements = elements;
     }
 
+    @Override
     public int getElementsCount() {
         return (elements == null) ? 0 : elements.size();
     }
 
+    @Override
     public boolean isRendered() {
         return rendered;
     }
@@ -105,6 +114,7 @@ public class DefaultSubMenu implements Submenu, Serializable {
         this.rendered = rendered;
     }
 
+    @Override
     public boolean isExpanded() {
         return expanded;
     }
@@ -113,6 +123,7 @@ public class DefaultSubMenu implements Submenu, Serializable {
         this.expanded = expanded;
     }
 
+    @Override
     public Object getParent() {
         return null;
     }
@@ -121,6 +132,7 @@ public class DefaultSubMenu implements Submenu, Serializable {
         elements.add(element);
     }
 
+    @Override
     public String getClientId() {
         return this.id;
     }

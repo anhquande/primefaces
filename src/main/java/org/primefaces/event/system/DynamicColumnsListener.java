@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.primefaces.component.treetable.TreeTable;
 
 public class DynamicColumnsListener implements SystemEventListener {
 
+    @Override
     public void processEvent(SystemEvent event) throws AbortProcessingException {
         Columns columns = (Columns) event.getSource();
         UIComponent parent = columns.getParent();
@@ -38,6 +39,7 @@ public class DynamicColumnsListener implements SystemEventListener {
         }
     }
 
+    @Override
     public boolean isListenerForSource(Object source) {
         return true;
     }

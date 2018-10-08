@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,9 @@
 package org.primefaces.component.datatable.feature;
 
 import java.io.IOException;
+
 import javax.faces.context.FacesContext;
+
 import org.primefaces.component.datatable.DataTable;
 import org.primefaces.component.datatable.DataTableRenderer;
 
@@ -24,7 +26,7 @@ public class AddRowFeature implements DataTableFeature {
 
     @Override
     public void decode(FacesContext context, DataTable table) {
-        throw new RuntimeException("RowEditFeature should not encode.");
+        throw new RuntimeException("AddRowFeature should not encode.");
     }
 
     @Override

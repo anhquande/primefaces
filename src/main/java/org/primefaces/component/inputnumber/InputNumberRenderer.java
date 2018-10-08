@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
+import javax.el.ValueExpression;
+import javax.faces.FacesException;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
@@ -28,10 +30,11 @@ import javax.faces.convert.Converter;
 import javax.faces.convert.ConverterException;
 
 import org.primefaces.component.inputtext.InputText;
-import org.primefaces.context.RequestContext;
 import org.primefaces.renderkit.InputRenderer;
 import org.primefaces.util.ComponentUtils;
+import org.primefaces.util.EscapeUtils;
 import org.primefaces.util.HTML;
+import org.primefaces.util.LangUtils;
 import org.primefaces.util.WidgetBuilder;
 
 public class InputNumberRenderer extends InputRenderer {
@@ -42,7 +45,7 @@ public class InputNumberRenderer extends InputRenderer {
 
         String submittedValueString = (String) submittedValue;
 
-        if (ComponentUtils.isValueBlank(submittedValueString)) {
+        if (LangUtils.isValueBlank(submittedValueString)) {
             return null;
         }
 
@@ -58,7 +61,7 @@ public class InputNumberRenderer extends InputRenderer {
     public void decode(FacesContext context, UIComponent component) {
         InputNumber inputNumber = (InputNumber) component;
 
-        if (inputNumber.isDisabled() || inputNumber.isReadonly()) {
+        if (!shouldDecode(inputNumber)) {
             return;
         }
 
@@ -67,10 +70,45 @@ public class InputNumberRenderer extends InputRenderer {
         String inputId = inputNumber.getClientId(context) + "_hinput";
         String submittedValue = context.getExternalContext().getRequestParameterMap().get(inputId);
 
-        if (submittedValue != null) {
-            inputNumber.setSubmittedValue(submittedValue);
+        try {
+            if (LangUtils.isValueBlank(submittedValue)) {
+                ValueExpression valueExpression = inputNumber.getValueExpression("value");
+                if (valueExpression != null) {
+                    Class<?> type = valueExpression.getType(context.getELContext());
+                    if (type != null && type.isPrimitive() && !LangUtils.isValueBlank(inputNumber.getMinValue())) {
+                        // avoid coercion of null or empty string to 0 which may be out of [minValue, maxValue] range
+                        submittedValue = String.valueOf(new BigDecimal(inputNumber.getMinValue()).doubleValue());
+                    }
+                    else if (type != null && type.isPrimitive() && !LangUtils.isValueBlank(inputNumber.getMaxValue())) {
+                        // avoid coercion of null or empty string to 0 which may be out of [minValue, maxValue] range
+                        submittedValue = String.valueOf(new BigDecimal(inputNumber.getMaxValue()).doubleValue());
+                    }
+                    else {
+                        submittedValue = "";
+                    }
+                }
+            }
+            else {
+                BigDecimal value = new BigDecimal(submittedValue);
+                if (!LangUtils.isValueBlank(inputNumber.getMinValue())) {
+                    BigDecimal min = new BigDecimal(inputNumber.getMinValue());
+                    if (value.compareTo(min) < 0) {
+                        submittedValue = String.valueOf(min.doubleValue());
+                    }
+                }
+                if (!LangUtils.isValueBlank(inputNumber.getMaxValue())) {
+                    BigDecimal max = new BigDecimal(inputNumber.getMaxValue());
+                    if (value.compareTo(max) > 0) {
+                        submittedValue = String.valueOf(max.doubleValue());
+                    }
+                }
+            }
+        }
+        catch (NumberFormatException ex) {
+            throw new FacesException("Invalid number", ex);
         }
 
+        inputNumber.setSubmittedValue(submittedValue);
     }
 
     @Override
@@ -94,8 +132,9 @@ public class InputNumberRenderer extends InputRenderer {
 
         String styleClass = inputNumber.getStyleClass();
         styleClass = styleClass == null ? InputNumber.STYLE_CLASS : InputNumber.STYLE_CLASS + " " + styleClass;
+        styleClass = inputNumber.isValid() ? styleClass : styleClass + " ui-state-error"; // see #3706
 
-        writer.startElement("span", null);
+        writer.startElement("span", inputNumber);
         writer.writeAttribute("id", clientId, null);
         writer.writeAttribute("class", styleClass, "styleClass");
 
@@ -131,9 +170,7 @@ public class InputNumberRenderer extends InputRenderer {
             writer.writeAttribute("onkeyup", inputNumber.getOnkeyup(), null);
         }
 
-        if (RequestContext.getCurrentInstance(context).getApplicationContext().getConfig().isClientSideValidationEnabled()) {
-            renderValidationMetadata(context, inputNumber);
-        }
+        renderValidationMetadata(context, inputNumber);
 
         writer.endElement("input");
 
@@ -163,33 +200,24 @@ public class InputNumberRenderer extends InputRenderer {
         writer.writeAttribute("type", inputNumber.getType(), null);
         writer.writeAttribute("value", valueToRender, null);
 
-        renderPassThruAttributes(context, inputNumber, HTML.INPUT_TEXT_ATTRS_WITHOUT_EVENTS);
-        renderDomEvents(context, inputNumber, HTML.INPUT_TEXT_EVENTS);
-
-        if (inputNumber.isReadonly()) {
-            writer.writeAttribute("readonly", "readonly", "readonly");
-        }
-        if (inputNumber.isDisabled()) {
-            writer.writeAttribute("disabled", "disabled", "disabled");
-        }
-
         if (!isValueBlank(style)) {
             writer.writeAttribute("style", style, null);
         }
 
         writer.writeAttribute("class", styleClass, null);
 
-        if (RequestContext.getCurrentInstance(context).getApplicationContext().getConfig().isClientSideValidationEnabled()) {
-            renderValidationMetadata(context, inputNumber);
-        }
+        renderAccessibilityAttributes(context, inputNumber);
+        renderPassThruAttributes(context, inputNumber, HTML.INPUT_TEXT_ATTRS_WITHOUT_EVENTS);
+        renderDomEvents(context, inputNumber, HTML.INPUT_TEXT_EVENTS);
+        renderValidationMetadata(context, inputNumber);
 
         writer.endElement("input");
     }
 
     protected void encodeScript(FacesContext context, InputNumber inputNumber, Object value, String valueToRender)
             throws IOException {
-        WidgetBuilder wb = RequestContext.getCurrentInstance(context).getWidgetBuilder();
-        wb.initWithDomReady(InputNumber.class.getSimpleName(), inputNumber.resolveWidgetVar(), inputNumber.getClientId());
+        WidgetBuilder wb = getWidgetBuilder(context);
+        wb.init(InputNumber.class.getSimpleName(), inputNumber.resolveWidgetVar(), inputNumber.getClientId());
         wb.attr("disabled", inputNumber.isDisabled())
                 .attr("valueToRender", formatForPlugin(valueToRender, inputNumber, value));
 
@@ -216,17 +244,17 @@ public class InputNumberRenderer extends InputRenderer {
         boolean padControl = inputNumber.isPadControl();
 
         String options = "";
-        options += isValueBlank(decimalSeparator) ? "" : "aDec:\"" + escapeText(decimalSeparator) + "\",";
+        options += isValueBlank(decimalSeparator) ? "" : "aDec:\"" + EscapeUtils.forJavaScript(decimalSeparator) + "\",";
         //empty thousandSeparator must be explicity defined.
-        options += isValueBlank(thousandSeparator) ? "aSep:''," : "aSep:\"" + escapeText(thousandSeparator) + "\",";
-        options += isValueBlank(symbol) ? "" : "aSign:\"" + escapeText(symbol) + "\",";
-        options += isValueBlank(symbolPosition) ? "" : "pSign:\"" + escapeText(symbolPosition) + "\",";
-        options += isValueBlank(minValue) ? "" : "vMin:\"" + escapeText(minValue) + "\",";
-        options += isValueBlank(maxValue) ? "" : "vMax:\"" + escapeText(maxValue) + "\",";
-        options += isValueBlank(roundMethod) ? "" : "mRound:\"" + escapeText(roundMethod) + "\",";
-        options += isValueBlank(decimalPlaces) ? "" : "mDec:\"" + escapeText(decimalPlaces) + "\",";
-        options += "wEmpty:\"" + escapeText(emptyValue) + "\",";
-        options += "lZero:\"" + escapeText(lZero) + "\",";
+        options += isValueBlank(thousandSeparator) ? "aSep:''," : "aSep:\"" + EscapeUtils.forJavaScript(thousandSeparator) + "\",";
+        options += isValueBlank(symbol) ? "" : "aSign:\"" + EscapeUtils.forJavaScript(symbol) + "\",";
+        options += isValueBlank(symbolPosition) ? "" : "pSign:\"" + EscapeUtils.forJavaScript(symbolPosition) + "\",";
+        options += isValueBlank(minValue) ? "" : "vMin:\"" + EscapeUtils.forJavaScript(minValue) + "\",";
+        options += isValueBlank(maxValue) ? "" : "vMax:\"" + EscapeUtils.forJavaScript(maxValue) + "\",";
+        options += isValueBlank(roundMethod) ? "" : "mRound:\"" + EscapeUtils.forJavaScript(roundMethod) + "\",";
+        options += isValueBlank(decimalPlaces) ? "" : "mDec:\"" + EscapeUtils.forJavaScript(decimalPlaces) + "\",";
+        options += "wEmpty:\"" + EscapeUtils.forJavaScript(emptyValue) + "\",";
+        options += "lZero:\"" + EscapeUtils.forJavaScript(lZero) + "\",";
         options += "aPad:" + padControl + ",";
 
         //if all options are empty return empty

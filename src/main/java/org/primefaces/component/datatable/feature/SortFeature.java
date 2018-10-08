@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,7 @@
 package org.primefaces.component.datatable.feature;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 import javax.el.MethodExpression;
 import javax.el.ValueExpression;
@@ -28,19 +24,16 @@ import javax.faces.FacesException;
 import javax.faces.context.FacesContext;
 import javax.faces.model.ListDataModel;
 
+import org.primefaces.PrimeFaces;
 import org.primefaces.component.api.DynamicColumn;
 import org.primefaces.component.api.UIColumn;
 import org.primefaces.component.column.Column;
 import org.primefaces.component.datatable.DataTable;
 import org.primefaces.component.datatable.DataTableRenderer;
+import org.primefaces.component.datatable.MultiSortState;
 import org.primefaces.component.datatable.TableState;
-import org.primefaces.context.RequestContext;
 import org.primefaces.event.data.PostSortEvent;
-import org.primefaces.model.BeanPropertyComparator;
-import org.primefaces.model.ChainedBeanPropertyComparator;
-import org.primefaces.model.DynamicChainedPropertyComparator;
-import org.primefaces.model.SortMeta;
-import org.primefaces.model.SortOrder;
+import org.primefaces.model.*;
 
 public class SortFeature implements DataTableFeature {
 
@@ -57,34 +50,13 @@ public class SortFeature implements DataTableFeature {
         String sortDir = params.get(clientId + "_sortDir");
 
         if (table.isMultiSort()) {
-            List<SortMeta> multiSortMeta = new ArrayList<SortMeta>();
+            List<SortMeta> multiSortMeta = new ArrayList<>();
             String[] sortKeys = sortKey.split(",");
             String[] sortOrders = sortDir.split(",");
 
             for (int i = 0; i < sortKeys.length; i++) {
                 UIColumn sortColumn = table.findColumn(sortKeys[i]);
-                ValueExpression columnSortByVE = sortColumn.getValueExpression(Column.PropertyKeys.sortBy.toString());
-                String sortField;
-
-                if (sortColumn.isDynamic()) {
-                    ((DynamicColumn) sortColumn).applyStatelessModel();
-                    String field = sortColumn.getField();
-                    if (field == null) {
-                        sortField = table.resolveDynamicField(columnSortByVE);
-                    }
-                    else {
-                        sortField = field;
-                    }
-                }
-                else {
-                    String field = sortColumn.getField();
-                    if (field == null) {
-                        sortField = table.resolveStaticField(columnSortByVE);
-                    }
-                    else {
-                        sortField = field;
-                    }
-                }
+                String sortField = table.resolveColumnField(sortColumn);
 
                 multiSortMeta.add(
                         new SortMeta(
@@ -103,7 +75,7 @@ public class SortFeature implements DataTableFeature {
             table.setSortColumn(sortColumn);
             table.setSortFunction(sortColumn.getSortFunction());
             table.setSortOrder(convertSortOrderParam(sortDir));
-            table.setSortField(sortColumn.getField());
+            table.setSortField(table.resolveColumnField(sortColumn));
         }
     }
 
@@ -114,6 +86,14 @@ public class SortFeature implements DataTableFeature {
         if (table.isLazy()) {
             if (table.isLiveScroll()) {
                 table.loadLazyScrollData(0, table.getScrollRows());
+            }
+            else if (table.isVirtualScroll()) {
+                int rows = table.getRows();
+                int scrollRows = table.getScrollRows();
+                int virtualScrollRows = (scrollRows * 2);
+                scrollRows = (rows == 0) ? virtualScrollRows : ((virtualScrollRows > rows) ? rows : virtualScrollRows);
+
+                table.loadLazyScrollData(0, scrollRows);
             }
             else {
                 table.loadLazyData();
@@ -128,11 +108,7 @@ public class SortFeature implements DataTableFeature {
             }
 
             if (table.isPaginator()) {
-                RequestContext requestContext = RequestContext.getCurrentInstance(context);
-
-                if (requestContext != null) {
-                    requestContext.addCallbackParam("totalRecords", table.getRowCount());
-                }
+                PrimeFaces.current().ajax().addCallbackParam("totalRecords", table.getRowCount());
             }
 
             //save state
@@ -145,22 +121,12 @@ public class SortFeature implements DataTableFeature {
         renderer.encodeTbody(context, table, true);
 
         if (table.isMultiViewState()) {
-            ValueExpression sortVE;
-            String sortField = table.getSortField();
-            if (sortField != null) {
-                sortVE = context.getApplication()
-                        .getExpressionFactory()
-                        .createValueExpression("#{'" + sortField + "'}",
-                                String.class);
-            }
-            else {
-                sortVE = table.getValueExpression(DataTable.PropertyKeys.sortBy.toString());
-            }
-            List<SortMeta> multiSortMeta = table.isMultiSort() ? table.getMultiSortMeta() : null;
-            if (sortVE != null || multiSortMeta != null) {
+            ValueExpression sortVE = table.getValueExpression(DataTable.PropertyKeys.sortBy.toString());
+            List<MultiSortState> multiSortState = table.isMultiSort() ? table.getMultiSortState() : null;
+            if (sortVE != null || multiSortState != null) {
                 TableState ts = table.getTableState(true);
                 ts.setSortBy(sortVE);
-                ts.setMultiSortMeta(multiSortMeta);
+                ts.setMultiSortState(multiSortState);
                 ts.setSortOrder(table.getSortOrder());
                 ts.setSortField(table.getSortField());
                 ts.setSortFunction(table.getSortFunction());
@@ -179,17 +145,7 @@ public class SortFeature implements DataTableFeature {
             return;
         }
 
-        ValueExpression sortVE;
-        String sortField = table.getSortField();
-        if (sortField != null) {
-            sortVE = context.getApplication()
-                    .getExpressionFactory()
-                    .createValueExpression("#{'" + sortField + "'}",
-                            String.class);
-        }
-        else {
-            sortVE = table.getValueExpression(DataTable.PropertyKeys.sortBy.toString());
-        }
+        ValueExpression sortVE = table.getValueExpression(DataTable.PropertyKeys.sortBy.toString());
         SortOrder sortOrder = SortOrder.valueOf(table.getSortOrder().toUpperCase(Locale.ENGLISH));
         MethodExpression sortFunction = table.getSortFunction();
         List list = null;

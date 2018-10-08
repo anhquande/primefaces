@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,20 +33,24 @@ public class DefaultScheduleModel implements ScheduleModel, Serializable {
         this.events = events;
     }
 
+    @Override
     public void addEvent(ScheduleEvent event) {
         event.setId(UUID.randomUUID().toString());
 
         events.add(event);
     }
 
+    @Override
     public boolean deleteEvent(ScheduleEvent event) {
         return events.remove(event);
     }
 
+    @Override
     public List<ScheduleEvent> getEvents() {
         return events;
     }
 
+    @Override
     public ScheduleEvent getEvent(String id) {
         for (ScheduleEvent event : events) {
             if (event.getId().equals(id)) {
@@ -57,6 +61,7 @@ public class DefaultScheduleModel implements ScheduleModel, Serializable {
         return null;
     }
 
+    @Override
     public void updateEvent(ScheduleEvent event) {
         int index = -1;
 
@@ -73,14 +78,17 @@ public class DefaultScheduleModel implements ScheduleModel, Serializable {
         }
     }
 
+    @Override
     public int getEventCount() {
         return events.size();
     }
 
+    @Override
     public void clear() {
         events = new ArrayList<ScheduleEvent>();
     }
 
+    @Override
     public boolean isEventLimit() {
         return eventLimit;
     }

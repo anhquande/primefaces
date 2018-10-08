@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ public class DefaultTagCloudModel implements TagCloudModel {
         tags = new ArrayList<TagCloudItem>(collection);
     }
 
+    @Override
     public List<TagCloudItem> getTags() {
         return tags;
     }
@@ -39,14 +40,17 @@ public class DefaultTagCloudModel implements TagCloudModel {
         this.tags = tags;
     }
 
+    @Override
     public void addTag(TagCloudItem item) {
         tags.add(item);
     }
 
+    @Override
     public void removeTag(TagCloudItem item) {
         tags.remove(item);
     }
 
+    @Override
     public void clear() {
         tags.clear();
     }

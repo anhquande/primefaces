@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ public class WrapperEvent extends FacesEvent {
 
     private FacesEvent event = null;
     private String rowKey = null;
-    
+
     public WrapperEvent(UIComponent component, FacesEvent event, String rowKey) {
         super(component);
         this.event = event;
@@ -36,25 +36,29 @@ public class WrapperEvent extends FacesEvent {
     }
 
     public FacesEvent getFacesEvent() {
-        return (this.event);
+        return (event);
     }
 
     public String getRowKey() {
         return rowKey;
     }
 
+    @Override
     public PhaseId getPhaseId() {
-        return (this.event.getPhaseId());
+        return (event.getPhaseId());
     }
 
+    @Override
     public void setPhaseId(PhaseId phaseId) {
-        this.event.setPhaseId(phaseId);
+        event.setPhaseId(phaseId);
     }
 
+    @Override
     public boolean isAppropriateListener(FacesListener listener) {
         return (false);
     }
 
+    @Override
     public void processListener(FacesListener listener) {
         throw new IllegalStateException();
     }

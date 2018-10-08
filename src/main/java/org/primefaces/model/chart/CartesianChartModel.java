@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import java.util.Map;
 public class CartesianChartModel extends ChartModel {
 
     protected Map<AxisType, Axis> axes;
-    
+
     private List<ChartSeries> series;
     private boolean zoom = false;
     private boolean animate = false;

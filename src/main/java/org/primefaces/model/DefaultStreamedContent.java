@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ public class DefaultStreamedContent implements StreamedContent {
 
     private String contentEncoding;
 
-    private Integer contentLenght;
+    private Integer contentLength;
 
     public DefaultStreamedContent() {
     }
@@ -54,15 +54,15 @@ public class DefaultStreamedContent implements StreamedContent {
         this.contentEncoding = contentEncoding;
     }
 
-    public DefaultStreamedContent(InputStream stream, String contentType, String name, Integer contentLenght) {
+    public DefaultStreamedContent(InputStream stream, String contentType, String name, Integer contentLength) {
         this(stream, contentType, name);
-        this.contentLenght = contentLenght;
+        this.contentLength = contentLength;
     }
 
-    public DefaultStreamedContent(InputStream stream, String contentType, String name, String contentEncoding, Integer contentLenght) {
+    public DefaultStreamedContent(InputStream stream, String contentType, String name, String contentEncoding, Integer contentLength) {
         this(stream, contentType, name);
         this.contentEncoding = contentEncoding;
-        this.contentLenght = contentLenght;
+        this.contentLength = contentLength;
     }
 
     @Override
@@ -101,7 +101,8 @@ public class DefaultStreamedContent implements StreamedContent {
         this.contentEncoding = contentEncoding;
     }
 
+    @Override
     public Integer getContentLength() {
-        return contentLenght;
+        return contentLength;
     }
 }

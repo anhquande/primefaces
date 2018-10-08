@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,11 @@
 package org.primefaces.component.inputtext;
 
 import java.io.IOException;
+
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
-import org.primefaces.context.RequestContext;
+
 import org.primefaces.renderkit.InputRenderer;
 import org.primefaces.util.ComponentUtils;
 import org.primefaces.util.HTML;
@@ -31,14 +32,14 @@ public class InputTextRenderer extends InputRenderer {
     public void decode(FacesContext context, UIComponent component) {
         InputText inputText = (InputText) component;
 
-        if (inputText.isDisabled() || inputText.isReadonly()) {
+        if (!shouldDecode(inputText)) {
             return;
         }
 
         decodeBehaviors(context, inputText);
 
         String clientId = inputText.getClientId(context);
-        String submittedValue = (String) context.getExternalContext().getRequestParameterMap().get(clientId);
+        String submittedValue = context.getExternalContext().getRequestParameterMap().get(clientId);
 
         if (submittedValue != null) {
             inputText.setSubmittedValue(submittedValue);
@@ -63,7 +64,7 @@ public class InputTextRenderer extends InputRenderer {
         ResponseWriter writer = context.getResponseWriter();
         String clientId = inputText.getClientId(context);
 
-        writer.startElement("input", null);
+        writer.startElement("input", inputText);
         writer.writeAttribute("id", clientId, null);
         writer.writeAttribute("name", clientId, null);
         writer.writeAttribute("type", inputText.getType(), null);
@@ -73,19 +74,17 @@ public class InputTextRenderer extends InputRenderer {
             writer.writeAttribute("value", valueToRender, null);
         }
 
-        renderPassThruAttributes(context, inputText, HTML.INPUT_TEXT_ATTRS_WITHOUT_EVENTS);
-        renderDomEvents(context, inputText, HTML.INPUT_TEXT_EVENTS);
-
-        if (inputText.isDisabled()) writer.writeAttribute("disabled", "disabled", null);
-        if (inputText.isReadonly()) writer.writeAttribute("readonly", "readonly", null);
-        if (inputText.getStyle() != null) writer.writeAttribute("style", inputText.getStyle(), null);
-        if (inputText.isRequired()) writer.writeAttribute("aria-required", "true", null);
+        if (inputText.getStyle() != null) {
+            writer.writeAttribute("style", inputText.getStyle(), null);
+        }
 
         writer.writeAttribute("class", createStyleClass(inputText), "styleClass");
 
-        if (RequestContext.getCurrentInstance(context).getApplicationContext().getConfig().isClientSideValidationEnabled()) {
-            renderValidationMetadata(context, inputText);
-        }
+        renderAccessibilityAttributes(context, inputText);
+        renderRTLDirection(context, inputText);
+        renderPassThruAttributes(context, inputText, HTML.INPUT_TEXT_ATTRS_WITHOUT_EVENTS);
+        renderDomEvents(context, inputText, HTML.INPUT_TEXT_EVENTS);
+        renderValidationMetadata(context, inputText);
 
         writer.endElement("input");
     }

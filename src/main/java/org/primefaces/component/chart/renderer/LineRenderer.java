@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,14 @@ package org.primefaces.component.chart.renderer;
 
 import java.io.IOException;
 import java.util.Iterator;
+
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
+
 import org.primefaces.component.chart.Chart;
 import org.primefaces.model.chart.CartesianChartModel;
 import org.primefaces.model.chart.ChartSeries;
 import org.primefaces.model.chart.LineChartModel;
-import org.primefaces.util.ComponentUtils;
 
 public class LineRenderer extends CartesianPlotRenderer {
 
@@ -33,24 +34,18 @@ public class LineRenderer extends CartesianPlotRenderer {
         CartesianChartModel model = (CartesianChartModel) chart.getModel();
 
         writer.write(",data:[");
-        for (Iterator<ChartSeries> it = model.getSeries().iterator(); it.hasNext();) {
+        for (Iterator<ChartSeries> it = model.getSeries().iterator(); it.hasNext(); ) {
             ChartSeries series = it.next();
 
             writer.write("[");
-            for (Iterator<Object> x = series.getData().keySet().iterator(); x.hasNext();) {
+            for (Iterator<Object> x = series.getData().keySet().iterator(); x.hasNext(); ) {
                 Object xValue = x.next();
                 Number yValue = series.getData().get(xValue);
-                String yValueAsString = ComponentUtils.escapeText((yValue != null) ? yValue.toString() : "null");
+                String yValueAsString = (yValue == null) ? "null" : escapeChartData(yValue);
+                String xValueAsString = escapeChartData(xValue);
 
                 writer.write("[");
-
-                if (xValue instanceof String) {
-                    writer.write("\"" + ComponentUtils.escapeText(xValue.toString()) + "\"," + yValueAsString);
-                }
-                else {
-                    writer.write(xValue + "," + yValueAsString);
-                }
-
+                writer.write(xValueAsString + "," + yValueAsString);
                 writer.write("]");
 
                 if (x.hasNext()) {
@@ -74,8 +69,8 @@ public class LineRenderer extends CartesianPlotRenderer {
         LineChartModel model = (LineChartModel) chart.getModel();
 
         writer.write(",series:[");
-        for (Iterator<ChartSeries> it = model.getSeries().iterator(); it.hasNext();) {
-            ChartSeries series = (ChartSeries) it.next();
+        for (Iterator<ChartSeries> it = model.getSeries().iterator(); it.hasNext(); ) {
+            ChartSeries series = it.next();
             series.encode(writer);
 
             if (it.hasNext()) {
@@ -85,11 +80,21 @@ public class LineRenderer extends CartesianPlotRenderer {
 
         writer.write("]");
 
-        if (model.isStacked()) writer.write(",stackSeries:true");
-        if (model.isBreakOnNull()) writer.write(",breakOnNull:true");
-        if (model.isZoom()) writer.write(",zoom:true");
-        if (model.isAnimate()) writer.write(",animate:true");
-        if (model.isShowPointLabels()) writer.write(",showPointLabels:true");
+        if (model.isStacked()) {
+            writer.write(",stackSeries:true");
+        }
+        if (model.isBreakOnNull()) {
+            writer.write(",breakOnNull:true");
+        }
+        if (model.isZoom()) {
+            writer.write(",zoom:true");
+        }
+        if (model.isAnimate()) {
+            writer.write(",animate:true");
+        }
+        if (model.isShowPointLabels()) {
+            writer.write(",showPointLabels:true");
+        }
 
         if (model.isShowDatatip()) {
             writer.write(",datatip:true");

@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,12 +25,13 @@ import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 import javax.faces.event.PhaseId;
 
+import org.primefaces.PrimeFaces;
 import org.primefaces.component.tabview.Tab;
-import org.primefaces.context.RequestContext;
 import org.primefaces.event.FlowEvent;
 import org.primefaces.renderkit.CoreRenderer;
 import org.primefaces.util.ComponentTraversalUtils;
 import org.primefaces.util.HTML;
+import org.primefaces.util.WidgetBuilder;
 
 public class WizardRenderer extends CoreRenderer {
 
@@ -79,7 +80,7 @@ public class WizardRenderer extends CoreRenderer {
                 tabToDisplay.encodeAll(context);
             }
 
-            RequestContext.getCurrentInstance(context).addCallbackParam("currentStep", wizard.getStep());
+            PrimeFaces.current().ajax().addCallbackParam("currentStep", wizard.getStep());
         }
     }
 
@@ -92,27 +93,23 @@ public class WizardRenderer extends CoreRenderer {
             throw new FacesException("Wizard : \"" + clientId + "\" must be inside a form element");
         }
 
-        startScript(writer, clientId);
-
-        writer.write("$(function() {");
-
-        writer.write("PrimeFaces.cw('Wizard','" + wizard.resolveWidgetVar() + "',{");
-        writer.write("id:'" + clientId + "'");
-        writer.write(",showStepStatus:" + wizard.isShowStepStatus());
-        writer.write(",showNavBar:" + wizard.isShowNavBar());
+        WidgetBuilder wb = getWidgetBuilder(context);
+        wb.init("Wizard", wizard.resolveWidgetVar(), clientId)
+                .attr("showStepStatus", wizard.isShowStepStatus())
+                .attr("showNavBar", wizard.isShowNavBar());
 
         if (wizard.getOnback() != null) {
-            writer.write(",onback:function(){" + wizard.getOnback() + "}");
+            wb.callback("onback", "function()", wizard.getOnback());
         }
         if (wizard.getOnnext() != null) {
-            writer.write(",onnext:function(){" + wizard.getOnnext() + "}");
+            wb.callback("onnext", "function()", wizard.getOnnext());
         }
 
         //all steps
         writer.write(",steps:[");
         boolean firstStep = true;
         String defaultStep = null;
-        for (Iterator<UIComponent> children = wizard.getChildren().iterator(); children.hasNext();) {
+        for (Iterator<UIComponent> children = wizard.getChildren().iterator(); children.hasNext(); ) {
             UIComponent child = children.next();
 
             if (child instanceof Tab && child.isRendered()) {
@@ -138,11 +135,9 @@ public class WizardRenderer extends CoreRenderer {
             wizard.setStep(defaultStep);
         }
 
-        writer.write(",initialStep:'" + wizard.getStep() + "'");
+        wb.attr("initialStep", wizard.getStep());
 
-        writer.write("});});");
-
-        endScript(writer);
+        wb.finish();
     }
 
     protected void encodeMarkup(FacesContext facesContext, Wizard wizard) throws IOException {
@@ -235,8 +230,12 @@ public class WizardRenderer extends CoreRenderer {
 
                 writer.startElement("li", null);
                 writer.writeAttribute("class", titleStyleClass, null);
-                if (tab.getTitleStyle() != null) writer.writeAttribute("style", tab.getTitleStyle(), null);
-                if (tab.getTitletip() != null) writer.writeAttribute("title", tab.getTitletip(), null);
+                if (tab.getTitleStyle() != null) {
+                    writer.writeAttribute("style", tab.getTitleStyle(), null);
+                }
+                if (tab.getTitletip() != null) {
+                    writer.writeAttribute("title", tab.getTitletip(), null);
+                }
 
                 if (titleFacet != null) {
                     titleFacet.encodeAll(context);

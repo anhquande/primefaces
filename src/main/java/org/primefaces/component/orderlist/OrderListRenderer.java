@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,15 @@ package org.primefaces.component.orderlist;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 import javax.faces.convert.Converter;
 import javax.faces.convert.ConverterException;
+
 import org.primefaces.component.column.Column;
 import org.primefaces.renderkit.CoreRenderer;
 import org.primefaces.util.HTML;
@@ -77,7 +78,7 @@ public class OrderListRenderer extends CoreRenderer {
         }
 
         writer.startElement("div", null);
-        writer.writeAttribute("class", "ui-grid-row", null);
+        writer.writeAttribute("class", "ui-g", null);
 
         if (controlsLocation.equals("left")) {
             encodeControls(context, ol);
@@ -98,7 +99,7 @@ public class OrderListRenderer extends CoreRenderer {
         String clientId = ol.getClientId(context);
         UIComponent caption = ol.getFacet("caption");
         String listStyleClass = OrderList.LIST_CLASS;
-        String columnGridClass = ol.getControlsLocation().equals("none") ? "ui-grid-col-12" : "ui-grid-col-10";
+        String columnGridClass = ol.getControlsLocation().equals("none") ? "ui-g-12 ui-md-12" : "ui-g-12 ui-md-10";
 
         writer.startElement("div", null);
         writer.writeAttribute("class", columnGridClass, null);
@@ -154,8 +155,7 @@ public class OrderListRenderer extends CoreRenderer {
         String var = old.getVar();
         Converter converter = old.getConverter();
 
-        for (Iterator it = model.iterator(); it.hasNext();) {
-            Object item = it.next();
+        for (Object item : model) {
             context.getExternalContext().getRequestMap().put(var, item);
             String value = converter != null ? converter.getAsString(context, old, old.getItemValue()) : old.getItemValue().toString();
 
@@ -174,8 +174,12 @@ public class OrderListRenderer extends CoreRenderer {
                         Column column = (Column) kid;
 
                         writer.startElement("td", null);
-                        if (column.getStyle() != null) writer.writeAttribute("style", column.getStyle(), null);
-                        if (column.getStyleClass() != null) writer.writeAttribute("class", column.getStyleClass(), null);
+                        if (column.getStyle() != null) {
+                            writer.writeAttribute("style", column.getStyle(), null);
+                        }
+                        if (column.getStyleClass() != null) {
+                            writer.writeAttribute("class", column.getStyleClass(), null);
+                        }
 
                         renderChildren(context, column);
                         writer.endElement("td");

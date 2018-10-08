@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,16 +58,17 @@ public class ResetInputActionListener implements ActionListener, Serializable {
         boolean resetModel = false;
         if (clearModel != null) {
             resetModel = clearModel.isLiteralText()
-                    ? Boolean.valueOf(clearModel.getValue(context.getELContext()).toString())
-                    : (Boolean) clearModel.getValue(context.getELContext());
+                         ? Boolean.parseBoolean(clearModel.getValue(context.getELContext()).toString())
+                         : (Boolean) clearModel.getValue(context.getELContext());
         }
-        
+
         ResetInputVisitCallback visitCallback = resetModel
-                ? ResetInputVisitCallback.INSTANCE_CLEAR_MODEL
-                : ResetInputVisitCallback.INSTANCE;
+                                                ? ResetInputVisitCallback.INSTANCE_CLEAR_MODEL
+                                                : ResetInputVisitCallback.INSTANCE;
 
         List<UIComponent> components = SearchExpressionFacade.resolveComponents(context, event.getComponent(), expressions);
-        for (UIComponent component : components) {
+        for (int i = 0; i < components.size(); i++) {
+            UIComponent component = components.get(i);
             component.visitTree(visitContext, visitCallback);
         }
     }

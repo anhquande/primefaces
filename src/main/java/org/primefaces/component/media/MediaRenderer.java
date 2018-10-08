@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ import javax.faces.component.UIComponent;
 import javax.faces.component.UIParameter;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
-import org.primefaces.application.resource.DynamicContentType;
 
+import org.primefaces.application.resource.DynamicContentType;
 import org.primefaces.component.media.player.MediaPlayer;
 import org.primefaces.component.media.player.MediaPlayerFactory;
 import org.primefaces.model.StreamedContent;
@@ -55,6 +55,20 @@ public class MediaRenderer extends CoreRenderer {
             if (streamedContent.getName() != null) {
                 int index = src.indexOf("?");
                 src = src.substring(0, index) + ";/" + streamedContent.getName() + "" + src.substring(index, src.length());
+            }
+        }
+
+        String type = player.getType();
+        if (type != null && type.equals("application/pdf")) {
+            String view = media.getView();
+            String zoom = media.getZoom();
+
+            if (view != null) {
+                src = src + "#view=" + view;
+            }
+
+            if (zoom != null) {
+                src += (view != null) ? "&zoom=" + zoom : "#zoom=" + zoom;
             }
         }
 

@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,9 @@ public class AccordionPanelRenderer extends CoreRenderer {
 
         if (active != null) {
             if (isValueBlank(active)) {
-                acco.setActiveIndex(null);
+                // set an empty string instead of null - otherwise the stateHelper will re-evaluate to the default value
+                // see GitHub #3140
+                acco.setActiveIndex("");
             }
             else {
                 acco.setActiveIndex(active);
@@ -156,19 +158,20 @@ public class AccordionPanelRenderer extends CoreRenderer {
 
         String activeIndex = acco.getActiveIndex();
         List<String> activeIndexes = activeIndex == null
-                ? Collections.EMPTY_LIST
-                : Arrays.asList(activeIndex.split(","));        
+                                     ? Collections.EMPTY_LIST
+                                     : Arrays.asList(activeIndex.split(","));
 
         if (var == null) {
-            int i = 0;
+            int j = 0;
 
-            for (UIComponent child : acco.getChildren()) {
+            for (int i = 0; i < acco.getChildCount(); i++) {
+                UIComponent child = acco.getChildren().get(i);
                 if (child.isRendered() && child instanceof Tab) {
-                    boolean active = activeIndexes.indexOf(Integer.toString(i)) != -1;
+                    boolean active = activeIndexes.indexOf(Integer.toString(j)) != -1;
 
                     encodeTab(context, acco, (Tab) child, active, dynamic, rtl);
 
-                    i++;
+                    j++;
                 }
             }
         }
@@ -188,19 +191,19 @@ public class AccordionPanelRenderer extends CoreRenderer {
     }
 
     protected void encodeTab(FacesContext context, AccordionPanel accordionPanel, Tab tab, boolean active, boolean dynamic,
-            boolean rtl) throws IOException {
-        
+                             boolean rtl) throws IOException {
+
         ResponseWriter writer = context.getResponseWriter();
 
         String headerClass = active ? AccordionPanel.ACTIVE_TAB_HEADER_CLASS : AccordionPanel.TAB_HEADER_CLASS;
         headerClass = tab.isDisabled() ? headerClass + " ui-state-disabled" : headerClass;
         headerClass = tab.getTitleStyleClass() == null ? headerClass : headerClass + " " + tab.getTitleStyleClass();
         String iconClass = active
-                ? AccordionPanel.ACTIVE_TAB_HEADER_ICON_CLASS
-                : (rtl ? AccordionPanel.TAB_HEADER_ICON_RTL_CLASS : AccordionPanel.TAB_HEADER_ICON_CLASS);
+                           ? AccordionPanel.ACTIVE_TAB_HEADER_ICON_CLASS
+                           : (rtl ? AccordionPanel.TAB_HEADER_ICON_RTL_CLASS : AccordionPanel.TAB_HEADER_ICON_CLASS);
         String contentClass = active
-                ? AccordionPanel.ACTIVE_TAB_CONTENT_CLASS
-                : AccordionPanel.INACTIVE_TAB_CONTENT_CLASS;
+                              ? AccordionPanel.ACTIVE_TAB_CONTENT_CLASS
+                              : AccordionPanel.INACTIVE_TAB_CONTENT_CLASS;
         UIComponent titleFacet = tab.getFacet("title");
         String title = tab.getTitle();
         String tabindex = tab.isDisabled() ? "-1" : accordionPanel.getTabindex();
@@ -209,12 +212,16 @@ public class AccordionPanelRenderer extends CoreRenderer {
         writer.startElement("div", null);
         writer.writeAttribute("class", headerClass, null);
         writer.writeAttribute("role", "tab", null);
-        writer.writeAttribute("aria-expanded", String.valueOf(active), null);
-        writer.writeAttribute("aria-selected", String.valueOf(active), null);
-        writer.writeAttribute("aria-label", tab.getAriaLabel(), null);
+        writer.writeAttribute(HTML.ARIA_EXPANDED, String.valueOf(active), null);
+        writer.writeAttribute(HTML.ARIA_SELECTED, String.valueOf(active), null);
+        writer.writeAttribute(HTML.ARIA_LABEL, tab.getAriaLabel(), null);
         writer.writeAttribute("tabindex", tabindex, null);
-        if (tab.getTitleStyle() != null) writer.writeAttribute("style", tab.getTitleStyle(), null);
-        if (tab.getTitletip() != null) writer.writeAttribute("title", tab.getTitletip(), null);
+        if (tab.getTitleStyle() != null) {
+            writer.writeAttribute("style", tab.getTitleStyle(), null);
+        }
+        if (tab.getTitletip() != null) {
+            writer.writeAttribute("title", tab.getTitletip(), null);
+        }
 
         //icon
         writer.startElement("span", null);
@@ -238,7 +245,7 @@ public class AccordionPanelRenderer extends CoreRenderer {
         writer.writeAttribute("id", tab.getClientId(context), null);
         writer.writeAttribute("class", contentClass, null);
         writer.writeAttribute("role", "tabpanel", null);
-        writer.writeAttribute("aria-hidden", String.valueOf(!active), null);
+        writer.writeAttribute(HTML.ARIA_HIDDEN, String.valueOf(!active), null);
 
         if (dynamic) {
             if (active) {

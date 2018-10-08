@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,17 @@
  */
 package org.primefaces.component.chart.renderer;
 
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-import javax.faces.context.FacesContext;
-import javax.faces.context.ResponseWriter;
 import org.primefaces.component.chart.Chart;
 import org.primefaces.model.chart.BarChartModel;
 import org.primefaces.model.chart.ChartSeries;
-import org.primefaces.util.ComponentUtils;
+import org.primefaces.util.EscapeUtils;
+
+import javax.faces.context.FacesContext;
+import javax.faces.context.ResponseWriter;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class BarRenderer extends CartesianPlotRenderer {
 
@@ -35,13 +37,14 @@ public class BarRenderer extends CartesianPlotRenderer {
 
         //data
         writer.write(",data:[");
-        for (Iterator<ChartSeries> it = model.getSeries().iterator(); it.hasNext();) {
+        for (Iterator<ChartSeries> it = model.getSeries().iterator(); it.hasNext(); ) {
             ChartSeries series = it.next();
             int i = 1;
 
             writer.write("[");
-            for (Iterator<Object> its = series.getData().keySet().iterator(); its.hasNext();) {
-                Number value = series.getData().get(its.next());
+            for (Iterator<Map.Entry<Object, Number>> its = series.getData().entrySet().iterator(); its.hasNext(); ) {
+                Map.Entry<Object, Number> entry = its.next();
+                Number value = entry.getValue();
                 String valueToRender = value != null ? value.toString() : "null";
 
                 if (horizontal) {
@@ -52,7 +55,12 @@ public class BarRenderer extends CartesianPlotRenderer {
                     i++;
                 }
                 else {
-                    writer.write(valueToRender);
+                    if (model.getDataRenderMode().equals("key")) {
+                        writer.write("'" + (String) entry.getKey() + "'," + valueToRender);
+                    }
+                    else {
+                        writer.write(valueToRender);
+                    }
                 }
 
                 if (its.hasNext()) {
@@ -79,36 +87,60 @@ public class BarRenderer extends CartesianPlotRenderer {
         int barMargin = model.getBarMargin();
         int barWidth = model.getBarWidth();
         List<String> ticks = model.getTicks();
+        String legendLabel = model.getLegendLabel();
 
         writer.write(",series:[");
-        for (Iterator<ChartSeries> it = model.getSeries().iterator(); it.hasNext();) {
-            ChartSeries series = (ChartSeries) it.next();
-            series.encode(writer);
+        if (model.getDataRenderMode().equals("key") && legendLabel != null) {
+            writer.write("{");
+            writer.write("label:\"" + EscapeUtils.forJavaScript(legendLabel) + "\"");
+            writer.write("}");
+        }
+        else {
+            for (Iterator<ChartSeries> it = model.getSeries().iterator(); it.hasNext(); ) {
+                ChartSeries series = it.next();
+                series.encode(writer);
 
-            if (it.hasNext()) {
-                writer.write(",");
+                if (it.hasNext()) {
+                    writer.write(",");
+                }
             }
         }
         writer.write("]");
 
         writer.write(",ticks:[");
         for (Iterator<String> tickIt = ticks.iterator(); tickIt.hasNext();) {
-            writer.write("\"" + ComponentUtils.escapeText(tickIt.next()) + "\"");
+            writer.write("\"" + EscapeUtils.forJavaScript(tickIt.next()) + "\"");
             if (tickIt.hasNext()) {
                 writer.write(",");
             }
         }
         writer.write("]");
 
-        if (orientation != null) writer.write(",orientation:\"" + orientation + "\"");
-        if (barPadding != 8) writer.write(",barPadding:" + barPadding);
-        if (barMargin != 10) writer.write(",barMargin:" + barMargin);
-        if (barWidth != 0) writer.write(",barWidth:" + barWidth);
-        if (model.isStacked()) writer.write(",stackSeries:true");       
-        if (model.isZoom()) writer.write(",zoom:true");        
-        if (model.isAnimate()) writer.write(",animate:true");  
-        if (model.isShowPointLabels()) writer.write(",showPointLabels:true");
-        
+        if (orientation != null) {
+            writer.write(",orientation:\"" + orientation + "\"");
+        }
+        if (barPadding != 8) {
+            writer.write(",barPadding:" + barPadding);
+        }
+        if (barMargin != 10) {
+            writer.write(",barMargin:" + barMargin);
+        }
+        if (barWidth != 0) {
+            writer.write(",barWidth:" + barWidth);
+        }
+        if (model.isStacked()) {
+            writer.write(",stackSeries:true");
+        }
+        if (model.isZoom()) {
+            writer.write(",zoom:true");
+        }
+        if (model.isAnimate()) {
+            writer.write(",animate:true");
+        }
+        if (model.isShowPointLabels()) {
+            writer.write(",showPointLabels:true");
+        }
+
         if (model.isShowDatatip()) {
             writer.write(",datatip:true");
             if (model.getDatatipFormat() != null) {

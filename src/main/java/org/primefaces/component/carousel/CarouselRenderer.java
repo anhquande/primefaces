@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ public class CarouselRenderer extends CoreRenderer {
         }
 
         if (params.containsKey(collapsedParam)) {
-            carousel.setCollapsed(Boolean.valueOf(params.get(collapsedParam)));
+            carousel.setCollapsed(Boolean.parseBoolean(params.get(collapsedParam)));
         }
     }
 
@@ -55,7 +55,7 @@ public class CarouselRenderer extends CoreRenderer {
     private void encodeScript(FacesContext context, Carousel carousel) throws IOException {
         String clientId = carousel.getClientId(context);
         WidgetBuilder wb = getWidgetBuilder(context);
-        wb.initWithDomReady("Carousel", carousel.resolveWidgetVar(), clientId);
+        wb.init("Carousel", carousel.resolveWidgetVar(), clientId);
 
         wb.attr("firstVisible", carousel.getFirstVisible(), 0)
                 .attr("circular", carousel.isCircular(), false)
@@ -185,7 +185,7 @@ public class CarouselRenderer extends CoreRenderer {
             facet.encodeAll(context);
         }
         else if (text != null) {
-            writer.write(text);
+            writer.writeText(text, "headerText");
         }
 
         writer.endElement("div");
@@ -215,7 +215,7 @@ public class CarouselRenderer extends CoreRenderer {
         }
 
         if (carousel.isResponsive()) {
-            encodeDropDown(context, carousel, clientId + "_mobiledropdown", Carousel.MOBILE_DROPDOWN_CLASS, itemCount);
+            encodeDropDown(context, carousel, clientId + "_responsivedropdown", Carousel.RESPONSIVE_DROPDOWN_CLASS, itemCount);
         }
 
         writer.endElement("div");
@@ -275,7 +275,7 @@ public class CarouselRenderer extends CoreRenderer {
             facet.encodeAll(context);
         }
         else if (text != null) {
-            writer.write(text);
+            writer.writeText(text, "footerText");
         }
 
         writer.endElement("div");

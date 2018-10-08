@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@ package org.primefaces.component.datatable;
 
 import java.io.Serializable;
 import java.util.List;
+
 import javax.el.MethodExpression;
 import javax.el.ValueExpression;
-import org.primefaces.model.SortMeta;
 
 public class TableState implements Serializable {
 
@@ -27,7 +27,7 @@ public class TableState implements Serializable {
 
     private int rows;
 
-    private List<SortMeta> multiSortMeta;
+    private List<MultiSortState> multiSortState;
 
     private ValueExpression sortBy;
 
@@ -49,6 +49,12 @@ public class TableState implements Serializable {
 
     private String globalFilterValue;
 
+    private String orderedColumnsAsString;
+
+    private String togglableColumnsAsString;
+
+    private String resizableColumnsAsString;
+
     public int getFirst() {
         return first;
     }
@@ -65,12 +71,12 @@ public class TableState implements Serializable {
         this.rows = rows;
     }
 
-    public List<SortMeta> getMultiSortMeta() {
-        return multiSortMeta;
+    public List<MultiSortState> getMultiSortState() {
+        return multiSortState;
     }
 
-    public void setMultiSortMeta(List<SortMeta> multiSortMeta) {
-        this.multiSortMeta = multiSortMeta;
+    public void setMultiSortState(List<MultiSortState> multiSortState) {
+        this.multiSortState = multiSortState;
     }
 
     public ValueExpression getSortBy() {
@@ -151,5 +157,29 @@ public class TableState implements Serializable {
 
     public void setGlobalFilterValue(String globalFilterValue) {
         this.globalFilterValue = globalFilterValue;
+    }
+
+    public String getOrderedColumnsAsString() {
+        return orderedColumnsAsString;
+    }
+
+    public void setOrderedColumnsAsString(String orderedColumnsAsString) {
+        this.orderedColumnsAsString = orderedColumnsAsString;
+    }
+
+    public String getTogglableColumnsAsString() {
+        return togglableColumnsAsString;
+    }
+
+    public void setTogglableColumnsAsString(String togglableColumnsAsString) {
+        this.togglableColumnsAsString = togglableColumnsAsString;
+    }
+
+    public String getResizableColumnsAsString() {
+        return resizableColumnsAsString;
+    }
+
+    public void setResizableColumnsAsString(String resizableColumnsAsString) {
+        this.resizableColumnsAsString = resizableColumnsAsString;
     }
 }

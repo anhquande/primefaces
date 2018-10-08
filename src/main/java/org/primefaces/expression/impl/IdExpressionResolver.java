@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,11 +29,12 @@ public class IdExpressionResolver implements SearchExpressionResolver, MultiSear
 
     private static final Pattern PATTERN = Pattern.compile("@id\\(([\\w-]+)\\)");
 
+    @Override
     public UIComponent resolveComponent(FacesContext context, UIComponent source, UIComponent last, String expression, int options) {
-        throw new FacesException("@id likely returns multiple components, therefore it's not supported in #resolveComponent... expression \"" + expression
-                + "\" referenced from \"" + source.getClientId(context) + "\".");
+        return ComponentTraversalUtils.firstWithId(extractId(expression), last);
     }
 
+    @Override
     public void resolveComponents(FacesContext context, UIComponent source, UIComponent last, String expression, List<UIComponent> components, int options) {
         ComponentTraversalUtils.withId(
                 extractId(expression),

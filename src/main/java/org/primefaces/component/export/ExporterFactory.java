@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import javax.faces.FacesException;
 
 public class ExporterFactory {
 
-    public static Exporter getExporterForType(String type) {
+    public static Exporter getExporterForType(String type, ExporterOptions options) {
         Exporter exporter = null;
 
         try {
@@ -35,7 +35,7 @@ public class ExporterFactory {
                     break;
 
                 case CSV:
-                    exporter = new CSVExporter();
+                    exporter = new CSVExporter(options);
                     break;
 
                 case XML:

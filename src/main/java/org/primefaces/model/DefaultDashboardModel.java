@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,22 +27,27 @@ public class DefaultDashboardModel implements DashboardModel, Serializable {
         columns = new ArrayList<DashboardColumn>();
     }
 
+    @Override
     public List<DashboardColumn> getColumns() {
         return columns;
     }
 
+    @Override
     public void addColumn(DashboardColumn column) {
         columns.add(column);
     }
 
+    @Override
     public int getColumnCount() {
         return columns.size();
     }
 
+    @Override
     public DashboardColumn getColumn(int index) {
         return columns.get(index);
     }
 
+    @Override
     public void transferWidget(DashboardColumn fromColumn, DashboardColumn toColumn, String widgetId, int index) {
         fromColumn.removeWidget(widgetId);
         toColumn.addWidget(index, widgetId);

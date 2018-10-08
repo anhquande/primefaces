@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ package org.primefaces.component.menu;
 
 import java.io.IOException;
 import java.util.List;
-import javax.faces.component.UIComponent;
 
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
@@ -30,12 +29,13 @@ import org.primefaces.util.WidgetBuilder;
 
 public class MenuRenderer extends BaseMenuRenderer {
 
+    @Override
     protected void encodeScript(FacesContext context, AbstractMenu abstractMenu) throws IOException {
         Menu menu = (Menu) abstractMenu;
         String clientId = menu.getClientId(context);
 
         WidgetBuilder wb = getWidgetBuilder(context);
-        wb.initWithDomReady("PlainMenu", menu.resolveWidgetVar(), clientId)
+        wb.init("PlainMenu", menu.resolveWidgetVar(), clientId)
                 .attr("toggleable", menu.isToggleable(), false);
 
         if (menu.isOverlay()) {
@@ -45,6 +45,7 @@ public class MenuRenderer extends BaseMenuRenderer {
         wb.finish();
     }
 
+    @Override
     protected void encodeMarkup(FacesContext context, AbstractMenu abstractMenu) throws IOException {
         ResponseWriter writer = context.getResponseWriter();
         Menu menu = (Menu) abstractMenu;
@@ -70,14 +71,14 @@ public class MenuRenderer extends BaseMenuRenderer {
         if (menu.getElementsCount() > 0) {
             writer.startElement("ul", null);
             writer.writeAttribute("class", Menu.LIST_CLASS, null);
-            encodeElements(context, menu, menu.getElements());
+            encodeElements(context, menu, menu.getElements(), false);
             writer.endElement("ul");
         }
 
         writer.endElement("div");
     }
 
-    protected void encodeElements(FacesContext context, Menu menu, List<MenuElement> elements) throws IOException {
+    protected void encodeElements(FacesContext context, Menu menu, List<MenuElement> elements, boolean isSubmenu) throws IOException {
         ResponseWriter writer = context.getResponseWriter();
         boolean toggleable = menu.isToggleable();
 
@@ -89,9 +90,8 @@ public class MenuRenderer extends BaseMenuRenderer {
                     String containerStyleClass = menuItem.getContainerStyleClass();
                     containerStyleClass = (containerStyleClass == null) ? Menu.MENUITEM_CLASS : Menu.MENUITEM_CLASS + " " + containerStyleClass;
 
-                    if (toggleable && menuItem instanceof UIComponent) {
-                        UIComponent parent = ((UIComponent) menuItem).getParent();
-                        containerStyleClass = (parent instanceof Submenu) ? containerStyleClass + " " + Menu.SUBMENU_CHILD_CLASS : containerStyleClass;
+                    if (toggleable && isSubmenu) {
+                        containerStyleClass = containerStyleClass + " " + Menu.SUBMENU_CHILD_CLASS;
                     }
 
                     writer.startElement("li", null);
@@ -150,7 +150,7 @@ public class MenuRenderer extends BaseMenuRenderer {
 
         writer.endElement("li");
 
-        encodeElements(context, menu, submenu.getElements());
+        encodeElements(context, menu, submenu.getElements(), true);
     }
 
     protected void encodeIcon(FacesContext context, String label, String styleClass) throws IOException {

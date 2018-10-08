@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,22 +15,20 @@
  */
 package org.primefaces.util;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import org.primefaces.component.api.ClientBehaviorRenderingMode;
+import org.primefaces.config.PrimeConfiguration;
+import org.primefaces.context.PrimeApplicationContext;
+import org.primefaces.expression.SearchExpressionFacade;
+import org.primefaces.expression.SearchExpressionHint;
 
 import javax.faces.application.ProjectStage;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIParameter;
 import javax.faces.context.FacesContext;
 import javax.faces.view.facelets.FaceletException;
-
-import org.primefaces.component.api.ClientBehaviorRenderingMode;
-
-import org.primefaces.config.PrimeConfiguration;
-import org.primefaces.context.RequestContext;
-import org.primefaces.expression.SearchExpressionFacade;
-import org.primefaces.expression.SearchExpressionHint;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Helper to generate javascript code of an ajax call
@@ -84,7 +82,7 @@ public class AjaxRequestBuilder {
     }
 
     private AjaxRequestBuilder addExpressions(UIComponent component, String expressions, String key, int options) {
-        if (!ComponentUtils.isValueBlank(expressions)) {
+        if (!LangUtils.isValueBlank(expressions)) {
             String resolvedExpressions = SearchExpressionFacade.resolveClientIds(context, component, expressions, options);
             buffer.append(",").append(key).append(":\"").append(resolvedExpressions).append("\"");
         }
@@ -123,7 +121,7 @@ public class AjaxRequestBuilder {
     }
 
     public AjaxRequestBuilder delay(String delay) {
-        if (!ComponentUtils.isValueBlank(delay) && !delay.equals("none")) {
+        if (!LangUtils.isValueBlank(delay) && !delay.equals("none")) {
             buffer.append(",d:").append(delay);
 
             if (context.isProjectStage(ProjectStage.Development)) {
@@ -155,22 +153,8 @@ public class AjaxRequestBuilder {
         return this;
     }
 
-    @Deprecated
-    public AjaxRequestBuilder partialSubmit(boolean value, boolean partialSubmitSet) {
-        PrimeConfiguration config = RequestContext.getCurrentInstance(context).getApplicationContext().getConfig();
-
-        //component can override global setting
-        boolean partialSubmit = partialSubmitSet ? value : config.isPartialSubmitEnabled();
-
-        if (partialSubmit) {
-            buffer.append(",ps:true");
-        }
-
-        return this;
-    }
-
     public AjaxRequestBuilder partialSubmit(boolean value, boolean partialSubmitSet, String partialSubmitFilter) {
-        PrimeConfiguration config = RequestContext.getCurrentInstance(context).getApplicationContext().getConfig();
+        PrimeConfiguration config = PrimeApplicationContext.getCurrentInstance(context).getConfig();
 
         //component can override global setting
         boolean partialSubmit = partialSubmitSet ? value : config.isPartialSubmitEnabled();
@@ -187,7 +171,7 @@ public class AjaxRequestBuilder {
     }
 
     public AjaxRequestBuilder resetValues(boolean value, boolean resetValuesSet) {
-        PrimeConfiguration config = RequestContext.getCurrentInstance(context).getApplicationContext().getConfig();
+        PrimeConfiguration config = PrimeApplicationContext.getCurrentInstance(context).getConfig();
 
         //component can override global setting
         boolean resetValues = resetValuesSet ? value : config.isResetValuesEnabled();
@@ -234,7 +218,8 @@ public class AjaxRequestBuilder {
     public AjaxRequestBuilder params(UIComponent component) {
         boolean paramWritten = false;
 
-        for (UIComponent child : component.getChildren()) {
+        for (int i = 0; i < component.getChildCount(); i++) {
+            UIComponent child = component.getChildren().get(i);
             if (child instanceof UIParameter) {
                 UIParameter parameter = (UIParameter) child;
                 Object paramValue = parameter.getValue();
@@ -251,7 +236,8 @@ public class AjaxRequestBuilder {
                     buffer.append(",");
                 }
 
-                buffer.append("{name:").append("\"").append(parameter.getName()).append("\",value:\"").append(paramValue).append("\"}");
+                buffer.append("{name:").append("\"").append(EscapeUtils.forJavaScript(parameter.getName())).append("\",value:\"")
+                    .append(EscapeUtils.forJavaScript(paramValue.toString())).append("\"}");
             }
         }
 
@@ -275,7 +261,8 @@ public class AjaxRequestBuilder {
                     if (paramValue == null) {
                         paramValue = "";
                     }
-                    buffer.append("{name:").append("\"").append(name).append("\",value:\"").append(paramValue).append("\"}");
+                    buffer.append("{name:").append("\"").append(EscapeUtils.forJavaScript(name)).append("\",value:\"")
+                        .append(EscapeUtils.forJavaScript(paramValue)).append("\"}");
 
                     if (i < (size - 1)) {
                         buffer.append(",");
@@ -352,14 +339,10 @@ public class AjaxRequestBuilder {
     }
 
     private void addFragmentConfig() {
-        Map<Object, Object> attrs = RequestContext.getCurrentInstance(context).getAttributes();
+        Map<Object, Object> attrs = context.getAttributes();
         Object fragmentId = attrs.get(Constants.FRAGMENT_ID);
         if (fragmentId != null) {
             buffer.append(",fi:\"").append(fragmentId).append("\"");
-
-            if (attrs.containsKey(Constants.FRAGMENT_AUTO_RENDERED)) {
-                buffer.append(",fu:true");
-            }
         }
     }
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,10 @@ package org.primefaces.component.chart.renderer;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
+
 import org.primefaces.component.chart.Chart;
 import org.primefaces.model.chart.OhlcChartModel;
 import org.primefaces.model.chart.OhlcChartSeries;
@@ -33,18 +35,18 @@ public class OhlcRenderer extends CartesianPlotRenderer {
         List<OhlcChartSeries> data = model.getData();
 
         writer.write(",data:[[");
-        for (Iterator<OhlcChartSeries> it = data.iterator(); it.hasNext();) {
+        for (Iterator<OhlcChartSeries> it = data.iterator(); it.hasNext(); ) {
             OhlcChartSeries s = it.next();
             writer.write("[");
-            writer.write(String.valueOf(s.getValue()));
+            writer.write(escapeChartData(s.getValue()));
             writer.write(",");
-            writer.write(String.valueOf(s.getOpen()));
+            writer.write(escapeChartData(s.getOpen()));
             writer.write(",");
-            writer.write(String.valueOf(s.getHigh()));
+            writer.write(escapeChartData(s.getHigh()));
             writer.write(",");
-            writer.write(String.valueOf(s.getLow()));
+            writer.write(escapeChartData(s.getLow()));
             writer.write(",");
-            writer.write(String.valueOf(s.getClose()));
+            writer.write(escapeChartData(s.getClose()));
             writer.write("]");
 
             if (it.hasNext()) {

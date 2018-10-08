@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,19 @@
  */
 package org.primefaces.application;
 
+import org.primefaces.PrimeFaces;
+import org.primefaces.util.Constants;
+import org.primefaces.util.EscapeUtils;
+
+import javax.faces.application.ConfigurableNavigationHandler;
+import javax.faces.application.NavigationCase;
+import javax.faces.context.FacesContext;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import javax.faces.application.ConfigurableNavigationHandler;
-import javax.faces.application.NavigationCase;
-import javax.faces.context.FacesContext;
-import org.primefaces.context.RequestContext;
-import org.primefaces.util.Constants;
 
 public class DialogNavigationHandler extends ConfigurableNavigationHandler {
 
@@ -37,8 +39,7 @@ public class DialogNavigationHandler extends ConfigurableNavigationHandler {
 
     @Override
     public void handleNavigation(FacesContext context, String fromAction, String outcome) {
-        RequestContext requestContext = RequestContext.getCurrentInstance(context);
-        Map<Object, Object> attrs = requestContext.getAttributes();
+        Map<Object, Object> attrs = context.getAttributes();
         String dialogOutcome = (String) attrs.get(Constants.DIALOG_FRAMEWORK.OUTCOME);
 
         if (dialogOutcome != null) {
@@ -58,6 +59,7 @@ public class DialogNavigationHandler extends ConfigurableNavigationHandler {
             }
 
             String url = context.getApplication().getViewHandler().getBookmarkableURL(context, toViewId, params, includeViewParams);
+            url = EscapeUtils.forJavaScript(url);
 
             StringBuilder sb = new StringBuilder();
             String sourceComponentId = (String) attrs.get(Constants.DIALOG_FRAMEWORK.SOURCE_COMPONENT);
@@ -66,6 +68,7 @@ public class DialogNavigationHandler extends ConfigurableNavigationHandler {
             if (pfdlgcid == null) {
                 pfdlgcid = UUID.randomUUID().toString();
             }
+            pfdlgcid = EscapeUtils.forJavaScript(pfdlgcid);
 
             sb.append("PrimeFaces.openDialog({url:'").append(url).append("',pfdlgcid:'").append(pfdlgcid)
                     .append("',sourceComponentId:'").append(sourceComponentId).append("'");
@@ -82,7 +85,7 @@ public class DialogNavigationHandler extends ConfigurableNavigationHandler {
 
                     sb.append(optionName).append(":");
                     if (optionValue instanceof String) {
-                        sb.append("'").append(optionValue).append("'");
+                        sb.append("'").append(EscapeUtils.forJavaScript((String) optionValue)).append("'");
                     }
                     else {
                         sb.append(optionValue);
@@ -95,7 +98,7 @@ public class DialogNavigationHandler extends ConfigurableNavigationHandler {
             }
             sb.append("}});");
 
-            requestContext.execute(sb.toString());
+            PrimeFaces.current().executeScript(sb.toString());
             sb.setLength(0);
         }
         else {

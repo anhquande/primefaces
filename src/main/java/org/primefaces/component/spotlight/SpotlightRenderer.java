@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,11 @@
 package org.primefaces.component.spotlight;
 
 import java.io.IOException;
+
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
+
 import org.primefaces.expression.SearchExpressionFacade;
 import org.primefaces.renderkit.CoreRenderer;
 import org.primefaces.util.WidgetBuilder;
@@ -45,7 +47,7 @@ public class SpotlightRenderer extends CoreRenderer {
         String clientId = spotlight.getClientId(context);
 
         WidgetBuilder wb = getWidgetBuilder(context);
-        wb.initWithDomReady("Spotlight", spotlight.resolveWidgetVar(), clientId);
+        wb.init("Spotlight", spotlight.resolveWidgetVar(), clientId);
 
         wb.attr("target", SearchExpressionFacade.resolveClientIds(context, spotlight, spotlight.getTarget()));
         wb.attr("active", spotlight.isActive(), false);

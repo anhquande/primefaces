@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,11 @@
 package org.primefaces.component.link;
 
 import java.io.IOException;
+
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
+
 import org.primefaces.renderkit.OutcomeTargetRenderer;
 import org.primefaces.util.HTML;
 
@@ -61,7 +63,7 @@ public class LinkRenderer extends OutcomeTargetRenderer {
             writer.writeAttribute("href", targetURL, null);
             writer.writeAttribute("class", styleClass, "styleClass");
             renderPassThruAttributes(context, link, HTML.LINK_ATTRS_WITHOUT_EVENTS);
-            renderDomEvents(context, link, HTML.COMMON_EVENTS);
+            renderDomEvents(context, link, HTML.OUTPUT_EVENTS);
             renderContent(context, link);
             writer.endElement("a");
         }

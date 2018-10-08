@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,11 @@ package org.primefaces.component.tieredmenu;
 
 import java.io.IOException;
 import java.util.List;
-import javax.faces.component.UIComponent;
 
+import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
+
 import org.primefaces.component.menu.AbstractMenu;
 import org.primefaces.component.menu.BaseMenuRenderer;
 import org.primefaces.component.menu.Menu;
@@ -28,16 +29,18 @@ import org.primefaces.model.menu.MenuElement;
 import org.primefaces.model.menu.MenuItem;
 import org.primefaces.model.menu.Separator;
 import org.primefaces.model.menu.Submenu;
+import org.primefaces.util.HTML;
 import org.primefaces.util.WidgetBuilder;
 
 public class TieredMenuRenderer extends BaseMenuRenderer {
 
+    @Override
     protected void encodeScript(FacesContext context, AbstractMenu abstractMenu) throws IOException {
         TieredMenu menu = (TieredMenu) abstractMenu;
         String clientId = menu.getClientId(context);
 
         WidgetBuilder wb = getWidgetBuilder(context);
-        wb.initWithDomReady("TieredMenu", menu.resolveWidgetVar(), clientId)
+        wb.init("TieredMenu", menu.resolveWidgetVar(), clientId)
                 .attr("autoDisplay", menu.isAutoDisplay())
                 .attr("toggleEvent", menu.getToggleEvent(), null);
 
@@ -48,6 +51,7 @@ public class TieredMenuRenderer extends BaseMenuRenderer {
         wb.finish();
     }
 
+    @Override
     protected void encodeMarkup(FacesContext context, AbstractMenu abstractMenu) throws IOException {
         TieredMenu menu = (TieredMenu) abstractMenu;
         String style = menu.getStyle();
@@ -127,7 +131,7 @@ public class TieredMenuRenderer extends BaseMenuRenderer {
                         writer.writeAttribute("style", style, null);
                     }
                     writer.writeAttribute("role", "menuitem", null);
-                    writer.writeAttribute("aria-haspopup", "true", null);
+                    writer.writeAttribute(HTML.ARIA_HASPOPUP, "true", null);
                     encodeSubmenu(context, menu, submenu);
                     writer.endElement("li");
                 }

@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,11 @@ package org.primefaces.component.fieldset;
 
 import java.io.IOException;
 import java.util.Map;
+
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
+
 import org.primefaces.renderkit.CoreRenderer;
 import org.primefaces.util.HTML;
 import org.primefaces.util.WidgetBuilder;
@@ -34,7 +36,7 @@ public class FieldsetRenderer extends CoreRenderer {
         String toggleStateParam = clientId + "_collapsed";
 
         if (params.containsKey(toggleStateParam)) {
-            fieldset.setCollapsed(Boolean.valueOf(params.get(toggleStateParam)));
+            fieldset.setCollapsed(Boolean.parseBoolean(params.get(toggleStateParam)));
         }
 
         decodeBehaviors(context, component);
@@ -53,6 +55,7 @@ public class FieldsetRenderer extends CoreRenderer {
         String clientId = fieldset.getClientId(context);
         String widgetVar = fieldset.resolveWidgetVar();
         boolean toggleable = fieldset.isToggleable();
+        String title = fieldset.getTitle();
 
         String styleClass = toggleable ? Fieldset.TOGGLEABLE_FIELDSET_CLASS : Fieldset.FIELDSET_CLASS;
         if (fieldset.isCollapsed()) {
@@ -63,6 +66,9 @@ public class FieldsetRenderer extends CoreRenderer {
         }
 
         writer.startElement("fieldset", fieldset);
+        if (title != null) {
+            writer.writeAttribute("title", fieldset.getTitle(), null);
+        }
         writer.writeAttribute("id", clientId, "id");
         writer.writeAttribute("class", styleClass, "styleClass");
         if (fieldset.getStyle() != null) {
@@ -70,6 +76,8 @@ public class FieldsetRenderer extends CoreRenderer {
         }
 
         writer.writeAttribute(HTML.WIDGET_VAR, widgetVar, null);
+
+        renderDynamicPassThruAttributes(context, fieldset);
 
         encodeLegend(context, fieldset);
 

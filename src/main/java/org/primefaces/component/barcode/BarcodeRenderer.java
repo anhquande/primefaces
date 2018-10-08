@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,12 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
 import javax.faces.application.Resource;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
+
 import org.primefaces.application.resource.DynamicContentType;
 import org.primefaces.renderkit.CoreRenderer;
 import org.primefaces.util.Constants;
@@ -58,7 +60,7 @@ public class BarcodeRenderer extends CoreRenderer {
             Map<String, Object> session = context.getExternalContext().getSessionMap();
             Map<String, String> barcodeMapping = (Map) session.get(Constants.BARCODE_MAPPING);
             if (barcodeMapping == null) {
-                barcodeMapping = new HashMap<String, String>();
+                barcodeMapping = new HashMap<>();
                 session.put(Constants.BARCODE_MAPPING, barcodeMapping);
             }
             barcodeMapping.put(sessionKey, (String) value);
@@ -68,6 +70,7 @@ public class BarcodeRenderer extends CoreRenderer {
                     .append("&").append(Constants.DYNAMIC_CONTENT_TYPE_PARAM).append("=").append(dynamicContentType.toString())
                     .append("&gen=").append(type)
                     .append("&fmt=").append(barcode.getFormat())
+                    .append("&qrec=").append(barcode.getQrErrorCorrection())
                     .append("&hrp=").append(barcode.getHrp())
                     .append("&").append(Constants.DYNAMIC_CONTENT_CACHE_PARAM).append("=").append(barcode.isCache())
                     .append("&ori=").append(barcode.getOrientation())

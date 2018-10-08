@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,17 @@ import javax.faces.context.FacesContext;
 public class AgentUtils {
 
     private AgentUtils() {
+    }
+
+    public static boolean isEdge(FacesContext context) {
+        String userAgent = context.getExternalContext().getRequestHeaderMap().get("User-Agent");
+
+        if (userAgent == null) {
+            return false;
+        }
+        else {
+            return userAgent.contains("Edge");
+        }
     }
 
     public static boolean isIE(FacesContext context) {

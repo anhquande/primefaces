@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,14 +32,17 @@ public class BaseMenuModel implements MenuModel, Serializable {
         elements = new ArrayList<MenuElement>();
     }
 
+    @Override
     public void addElement(MenuElement element) {
         elements.add(element);
     }
 
+    @Override
     public List<MenuElement> getElements() {
         return elements;
     }
 
+    @Override
     public void generateUniqueIds() {
         this.generateUniqueIds(getElements(), null);
     }

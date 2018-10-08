@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,10 +67,12 @@ public class ByteArrayContent implements StreamedContent, Serializable {
         this.contentEncoding = contentEncoding;
     }
 
+    @Override
     public InputStream getStream() {
         return new ByteArrayInputStream(this.data);
     }
 
+    @Override
     public String getContentType() {
         return contentType;
     }
@@ -79,6 +81,7 @@ public class ByteArrayContent implements StreamedContent, Serializable {
         this.contentType = contentType;
     }
 
+    @Override
     public String getName() {
         return name;
     }
@@ -91,10 +94,12 @@ public class ByteArrayContent implements StreamedContent, Serializable {
         this.contentEncoding = contentEncoding;
     }
 
+    @Override
     public String getContentEncoding() {
         return contentEncoding;
     }
 
+    @Override
     public Integer getContentLength() {
         return contentLength;
     }

@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,14 @@ package org.primefaces.component.mindmap;
 
 import java.io.IOException;
 import java.util.List;
+
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
+
 import org.primefaces.model.mindmap.MindmapNode;
 import org.primefaces.renderkit.CoreRenderer;
+import org.primefaces.util.WidgetBuilder;
 
 public class MindmapRenderer extends CoreRenderer {
 
@@ -50,23 +53,18 @@ public class MindmapRenderer extends CoreRenderer {
         String clientId = map.getClientId(context);
         MindmapNode root = map.getValue();
 
-        startScript(writer, clientId);
-
-        writer.write("$(function(){");
-        writer.write("PrimeFaces.cw('Mindmap','" + map.resolveWidgetVar() + "',{");
-        writer.write("id:'" + clientId + "'");
+        WidgetBuilder wb = getWidgetBuilder(context);
+        wb.init("Mindmap", map.resolveWidgetVar(), clientId)
+                .attr("effectSpeed", map.getEffectSpeed());
 
         if (root != null) {
             writer.write(",model:");
             encodeNode(context, map, root, "root");
         }
 
-        writer.write(",effectSpeed:" + map.getEffectSpeed());
-
         encodeClientBehaviors(context, map);
 
-        writer.write("},'mindmap');});");
-        endScript(writer);
+        wb.finish();
     }
 
     protected void encodeMarkup(FacesContext context, Mindmap map) throws IOException {
@@ -130,8 +128,14 @@ public class MindmapRenderer extends CoreRenderer {
 
         writer.write("\"label\":\"" + node.getLabel() + "\"");
 
-        if (nodeKey != null) writer.write(",\"key\":\"" + nodeKey + "\"");
-        if (node.getFill() != null) writer.write(",\"fill\":\"" + node.getFill() + "\"");
-        if (node.isSelectable()) writer.write(",\"selectable\":true");
+        if (nodeKey != null) {
+            writer.write(",\"key\":\"" + nodeKey + "\"");
+        }
+        if (node.getFill() != null) {
+            writer.write(",\"fill\":\"" + node.getFill() + "\"");
+        }
+        if (node.isSelectable()) {
+            writer.write(",\"selectable\":true");
+        }
     }
 }

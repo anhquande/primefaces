@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,12 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
+
 import org.primefaces.component.chart.Chart;
 import org.primefaces.model.chart.DonutChartModel;
-import org.primefaces.util.ComponentUtils;
 
 public class DonutRenderer extends BasePlotRenderer {
 
@@ -41,11 +42,11 @@ public class DonutRenderer extends BasePlotRenderer {
 
             writer.write("[");
             Map<String, Number> map = (Map) data.get(i);
-            for (Iterator<String> it = map.keySet().iterator(); it.hasNext();) {
+            for (Iterator<String> it = map.keySet().iterator(); it.hasNext(); ) {
                 String key = it.next();
                 Number value = map.get(key);
 
-                writer.write("[\"" + ComponentUtils.escapeText(key) + "\"," + value + "]");
+                writer.write("[" + escapeChartData(key) + "," + value + "]");
 
                 if (it.hasNext()) {
                     writer.write(",");
@@ -70,12 +71,24 @@ public class DonutRenderer extends BasePlotRenderer {
         String dataLabelFormatString = model.getDataLabelFormatString();
         int dataLabelThreshold = model.getDataLabelThreshold();
 
-        if (sliceMargin != 0) writer.write(",sliceMargin:" + sliceMargin);
-        if (!fill) writer.write(",fill:false");
-        if (showDataLabels) writer.write(",showDataLabels:true");
-        if (dataFormat != null) writer.write(",dataFormat:\"" + dataFormat + "\"");
-        if (dataLabelFormatString != null) writer.write(",dataLabelFormatString:\"" + dataLabelFormatString + "\"");
-        if (dataLabelThreshold > 0 && dataLabelThreshold < 100) writer.write(",dataLabelThreshold:" + dataLabelThreshold);
+        if (sliceMargin != 0) {
+            writer.write(",sliceMargin:" + sliceMargin);
+        }
+        if (!fill) {
+            writer.write(",fill:false");
+        }
+        if (showDataLabels) {
+            writer.write(",showDataLabels:true");
+        }
+        if (dataFormat != null) {
+            writer.write(",dataFormat:\"" + dataFormat + "\"");
+        }
+        if (dataLabelFormatString != null) {
+            writer.write(",dataLabelFormatString:\"" + dataLabelFormatString + "\"");
+        }
+        if (dataLabelThreshold > 0 && dataLabelThreshold < 100) {
+            writer.write(",dataLabelThreshold:" + dataLabelThreshold);
+        }
 
         if (model.isShowDatatip()) {
             writer.write(",datatip:true");

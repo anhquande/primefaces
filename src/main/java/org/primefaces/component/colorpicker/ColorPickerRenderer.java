@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,26 +17,37 @@ package org.primefaces.component.colorpicker;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 import javax.faces.convert.Converter;
 
-import org.primefaces.renderkit.CoreRenderer;
+import org.primefaces.renderkit.InputRenderer;
 import org.primefaces.util.HTML;
 import org.primefaces.util.WidgetBuilder;
 
-public class ColorPickerRenderer extends CoreRenderer {
+public class ColorPickerRenderer extends InputRenderer {
+
+    private static final Pattern COLOR_HEX_PATTERN = Pattern.compile("([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})");
 
     @Override
     public void decode(FacesContext context, UIComponent component) {
         ColorPicker colorPicker = (ColorPicker) component;
+        if (!shouldDecode(colorPicker)) {
+            return;
+        }
         String paramName = colorPicker.getClientId(context) + "_input";
         Map<String, String> params = context.getExternalContext().getRequestParameterMap();
 
         if (params.containsKey(paramName)) {
             String submittedValue = params.get(paramName);
+
+            if (!COLOR_HEX_PATTERN.matcher(submittedValue).matches()) {
+                return;
+            }
+
             Converter converter = colorPicker.getConverter();
             if (converter != null) {
                 colorPicker.setSubmittedValue(
@@ -80,10 +91,10 @@ public class ColorPickerRenderer extends CoreRenderer {
         }
 
         if (isPopup) {
-            encodeButton(context, clientId, value);
+            encodeButton(context, colorPicker, clientId, value);
         }
         else {
-            encodeInline(context, clientId);
+            encodeInline(context, colorPicker, clientId);
         }
 
         //Input
@@ -107,13 +118,13 @@ public class ColorPickerRenderer extends CoreRenderer {
         writer.endElement("span");
     }
 
-    protected void encodeButton(FacesContext context, String clientId, String value) throws IOException {
+    protected void encodeButton(FacesContext context, ColorPicker colorPicker, String clientId, String value) throws IOException {
         ResponseWriter writer = context.getResponseWriter();
-
         writer.startElement("button", null);
         writer.writeAttribute("id", clientId + "_button", null);
         writer.writeAttribute("type", "button", null);
         writer.writeAttribute("class", HTML.BUTTON_TEXT_ONLY_BUTTON_CLASS, null);
+        renderAccessibilityAttributes(context, colorPicker);
 
         //text
         writer.startElement("span", null);
@@ -131,7 +142,7 @@ public class ColorPickerRenderer extends CoreRenderer {
         writer.endElement("button");
     }
 
-    protected void encodeInline(FacesContext context, String clientId) throws IOException {
+    protected void encodeInline(FacesContext context, ColorPicker colorPicker, String clientId) throws IOException {
         ResponseWriter writer = context.getResponseWriter();
 
         writer.startElement("div", null);
@@ -143,7 +154,7 @@ public class ColorPickerRenderer extends CoreRenderer {
         String clientId = colorPicker.getClientId(context);
         WidgetBuilder wb = getWidgetBuilder(context);
 
-        wb.initWithDomReady("ColorPicker", colorPicker.resolveWidgetVar(), clientId)
+        wb.init("ColorPicker", colorPicker.resolveWidgetVar(), clientId)
                 .attr("mode", colorPicker.getMode())
                 .attr("color", value, null);
 

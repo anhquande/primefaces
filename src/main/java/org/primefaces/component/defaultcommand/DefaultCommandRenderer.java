@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.primefaces.component.defaultcommand;
 
 import java.io.IOException;
+
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 
@@ -33,7 +34,7 @@ public class DefaultCommandRenderer extends CoreRenderer {
 
         String clientId = command.getClientId(context);
         WidgetBuilder wb = getWidgetBuilder(context);
-        wb.initWithDomReady("DefaultCommand", command.resolveWidgetVar(), clientId)
+        wb.init("DefaultCommand", command.resolveWidgetVar(), clientId)
                 .attr("target", target.getClientId(context));
 
         String scope = command.getScope();

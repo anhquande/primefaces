@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,13 +39,13 @@ public class PanelRenderer extends CoreRenderer {
         //Restore toggle state
         String collapsedParam = params.get(clientId + "_collapsed");
         if (collapsedParam != null) {
-            panel.setCollapsed(Boolean.valueOf(collapsedParam));
+            panel.setCollapsed(Boolean.parseBoolean(collapsedParam));
         }
 
         //Restore visibility state
         String visibleParam = params.get(clientId + "_visible");
         if (visibleParam != null) {
-            panel.setVisible(Boolean.valueOf(visibleParam));
+            panel.setVisible(Boolean.parseBoolean(visibleParam));
         }
 
         decodeBehaviors(context, component);
@@ -68,7 +68,8 @@ public class PanelRenderer extends CoreRenderer {
             wb.attr("toggleable", true)
                     .attr("toggleSpeed", panel.getToggleSpeed())
                     .attr("collapsed", panel.isCollapsed())
-                    .attr("toggleOrientation", panel.getToggleOrientation());
+                    .attr("toggleOrientation", panel.getToggleOrientation())
+                    .attr("toggleableHeader", panel.isToggleableHeader());
         }
 
         if (panel.isClosable()) {
@@ -187,7 +188,10 @@ public class PanelRenderer extends CoreRenderer {
         //Actions
         UIComponent actionsFacet = panel.getFacet("actions");
         if (actionsFacet != null) {
+            writer.startElement("div", null);
+            writer.writeAttribute("class", Panel.PANEL_ACTIONS_CLASS, null);
             actionsFacet.encodeAll(context);
+            writer.endElement("div");
         }
 
         writer.endElement("div");
@@ -213,7 +217,7 @@ public class PanelRenderer extends CoreRenderer {
         UIComponent footer = panel.getFacet("footer");
         String footerText = panel.getFooter();
 
-        if (footer != null || footerText != null) {
+        if (footerText != null || ComponentUtils.shouldRenderFacet(footer)) {
             writer.startElement("div", null);
             writer.writeAttribute("id", panel.getClientId(context) + "_footer", null);
             writer.writeAttribute("class", Panel.PANEL_FOOTER_CLASS, null);

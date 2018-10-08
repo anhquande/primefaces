@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,12 +31,14 @@ import javax.faces.context.ResponseWriter;
 import org.primefaces.model.LazyScheduleModel;
 import org.primefaces.model.ScheduleEvent;
 import org.primefaces.model.ScheduleModel;
+import org.primefaces.model.ScheduleRenderingMode;
 import org.primefaces.renderkit.CoreRenderer;
+import org.primefaces.util.EscapeUtils;
 import org.primefaces.util.WidgetBuilder;
 
 public class ScheduleRenderer extends CoreRenderer {
 
-    private final static Logger LOG = Logger.getLogger(ScheduleRenderer.class.getName());
+    private static final Logger LOG = Logger.getLogger(ScheduleRenderer.class.getName());
 
     @Override
     public void decode(FacesContext context, UIComponent component) {
@@ -67,15 +69,19 @@ public class ScheduleRenderer extends CoreRenderer {
 
     protected void encodeEvents(FacesContext context, Schedule schedule) throws IOException {
         String clientId = schedule.getClientId(context);
-        ScheduleModel model = (ScheduleModel) schedule.getValue();
+        ScheduleModel model = schedule.getValue();
         Map<String, String> params = context.getExternalContext().getRequestParameterMap();
 
         if (model instanceof LazyScheduleModel) {
             String startDateParam = params.get(clientId + "_start");
             String endDateParam = params.get(clientId + "_end");
 
-            Date startDate = new Date(Long.valueOf(startDateParam));
-            Date endDate = new Date(Long.valueOf(endDateParam));
+            Long startMillis = Long.valueOf(startDateParam);
+            Long endMillis = Long.valueOf(endDateParam);
+
+            TimeZone tz = schedule.calculateTimeZone();
+            Date startDate = new Date(startMillis - tz.getOffset(startMillis));
+            Date endDate = new Date(endMillis - tz.getOffset(endMillis));
 
             LazyScheduleModel lazyModel = ((LazyScheduleModel) model);
             lazyModel.clear(); //Clear old events
@@ -95,15 +101,16 @@ public class ScheduleRenderer extends CoreRenderer {
         writer.write("\"events\" : [");
 
         if (model != null) {
-            for (Iterator<ScheduleEvent> iterator = model.getEvents().iterator(); iterator.hasNext();) {
+            for (Iterator<ScheduleEvent> iterator = model.getEvents().iterator(); iterator.hasNext(); ) {
                 ScheduleEvent event = iterator.next();
                 String className = event.getStyleClass();
                 String description = event.getDescription();
                 String url = event.getUrl();
+                ScheduleRenderingMode renderingMode = event.getRenderingMode();
 
                 writer.write("{");
                 writer.write("\"id\": \"" + event.getId() + "\"");
-                writer.write(",\"title\": \"" + escapeText(event.getTitle()) + "\"");
+                writer.write(",\"title\": \"" + EscapeUtils.forJavaScript(event.getTitle()) + "\"");
                 writer.write(",\"start\": \"" + iso.format(event.getStartDate()) + "\"");
                 writer.write(",\"end\": \"" + iso.format(event.getEndDate()) + "\"");
                 writer.write(",\"allDay\":" + event.isAllDay());
@@ -112,10 +119,13 @@ public class ScheduleRenderer extends CoreRenderer {
                     writer.write(",\"className\":\"" + className + "\"");
                 }
                 if (description != null) {
-                    writer.write(",\"description\":\"" + escapeText(description) + "\"");
+                    writer.write(",\"description\":\"" + EscapeUtils.forJavaScript(description) + "\"");
                 }
                 if (url != null) {
-                    writer.write(",\"url\":\"" + escapeText(url) + "\"");
+                    writer.write(",\"url\":\"" + EscapeUtils.forJavaScript(url) + "\"");
+                }
+                if (renderingMode != null) {
+                    writer.write(",\"rendering\":\"" + renderingMode.getRendering() + "\"");
                 }
 
                 writer.write("}");
@@ -132,11 +142,11 @@ public class ScheduleRenderer extends CoreRenderer {
     protected void encodeScript(FacesContext context, Schedule schedule) throws IOException {
         String clientId = schedule.getClientId(context);
         WidgetBuilder wb = getWidgetBuilder(context);
-        wb.initWithDomReady("Schedule", schedule.resolveWidgetVar(), clientId)
+        wb.init("Schedule", schedule.resolveWidgetVar(), clientId)
                 .attr("defaultView", schedule.getView())
                 .attr("locale", schedule.calculateLocale(context).toString())
                 .attr("tooltip", schedule.isTooltip(), false)
-                .attr("eventLimit", ((ScheduleModel) schedule.getValue()).isEventLimit(), false)
+                .attr("eventLimit", schedule.getValue().isEventLimit(), false)
                 .attr("lazyFetching", false);
 
         Object initialDate = schedule.getInitialDate();
@@ -179,6 +189,13 @@ public class ScheduleRenderer extends CoreRenderer {
             clientTimezone = "local";
         }
 
+        String slotLabelFormat = schedule.getSlotLabelFormat();
+        String axisFormat = schedule.getAxisFormat();
+        if (axisFormat != null) {
+            LOG.warning("axisFormat is deprecated, use slotLabelFormat instead.");
+            slotLabelFormat = axisFormat;
+        }
+
         boolean isShowWeekNumbers = schedule.isShowWeekNumbers();
 
         wb.attr("allDaySlot", schedule.isAllDaySlot(), true)
@@ -191,7 +208,7 @@ public class ScheduleRenderer extends CoreRenderer {
                 .attr("weekends", schedule.isShowWeekends(), true)
                 .attr("eventStartEditable", schedule.isDraggable(), true)
                 .attr("eventDurationEditable", schedule.isResizable(), true)
-                .attr("axisFormat", schedule.getAxisFormat(), null)
+                .attr("slotLabelFormat", slotLabelFormat, null)
                 .attr("timeFormat", schedule.getTimeFormat(), null)
                 .attr("weekNumbers", isShowWeekNumbers, false)
                 .attr("nextDayThreshold", schedule.getNextDayThreshold(), "09:00:00")
@@ -245,8 +262,12 @@ public class ScheduleRenderer extends CoreRenderer {
 
         writer.startElement("div", null);
         writer.writeAttribute("id", clientId, null);
-        if (schedule.getStyle() != null) writer.writeAttribute("style", schedule.getStyle(), "style");
-        if (schedule.getStyleClass() != null) writer.writeAttribute("class", schedule.getStyleClass(), "style");
+        if (schedule.getStyle() != null) {
+            writer.writeAttribute("style", schedule.getStyle(), "style");
+        }
+        if (schedule.getStyleClass() != null) {
+            writer.writeAttribute("class", schedule.getStyleClass(), "style");
+        }
 
         writer.startElement("div", null);
         writer.writeAttribute("id", clientId + "_container", null);

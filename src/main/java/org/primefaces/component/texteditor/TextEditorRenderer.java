@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,11 +62,14 @@ public class TextEditorRenderer extends CoreRenderer {
 
         String style = editor.getStyle();
         String styleClass = editor.getStyleClass();
+        styleClass = (styleClass != null) ? TextEditor.EDITOR_CLASS + " " + styleClass : TextEditor.EDITOR_CLASS;
 
         writer.startElement("div", editor);
-        writer.writeAttribute("id", clientId , null);
-        if (style != null) writer.writeAttribute("style", style, null);
-        if (styleClass != null) writer.writeAttribute("class", editor.getStyleClass(), null);
+        writer.writeAttribute("id", clientId, null);
+        writer.writeAttribute("class", styleClass, null);
+        if (style != null) {
+            writer.writeAttribute("style", style, null);
+        }
 
         if (toolbar != null && editor.isToolbarVisible()) {
             writer.startElement("div", editor);
@@ -86,6 +89,10 @@ public class TextEditorRenderer extends CoreRenderer {
         writer.startElement("input", null);
         writer.writeAttribute("type", "hidden", null);
         writer.writeAttribute("name", inputId, null);
+        // #2905
+        if (valueToRender != null) {
+            writer.writeAttribute("value", valueToRender, null);
+        }
         writer.endElement("input");
 
         writer.endElement("div");
@@ -94,7 +101,7 @@ public class TextEditorRenderer extends CoreRenderer {
     private void encodeScript(FacesContext context, TextEditor editor) throws IOException {
         String clientId = editor.getClientId(context);
         WidgetBuilder wb = getWidgetBuilder(context);
-        wb.initWithDomReady("TextEditor", editor.resolveWidgetVar(), clientId)
+        wb.init("TextEditor", editor.resolveWidgetVar(), clientId)
                 .attr("toolbarVisible", editor.isToolbarVisible())
                 .attr("readOnly", editor.isReadonly(), false)
                 .attr("placeholder", editor.getPlaceholder(), null)

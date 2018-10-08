@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import org.primefaces.component.menu.AbstractMenu;
 import org.primefaces.component.menu.BaseMenuRenderer;
 import org.primefaces.model.menu.MenuElement;
 import org.primefaces.model.menu.MenuItem;
+import org.primefaces.util.HTML;
 import org.primefaces.util.WidgetBuilder;
 
 public class TabMenuRenderer extends BaseMenuRenderer {
@@ -47,7 +48,7 @@ public class TabMenuRenderer extends BaseMenuRenderer {
         String styleClass = menu.getStyleClass();
         styleClass = styleClass == null ? TabMenu.CONTAINER_CLASS : TabMenu.CONTAINER_CLASS + " " + styleClass;
         int activeIndex = menu.getActiveIndex();
-        List<MenuElement> elements = menu.getElements();
+        List<?> elements = menu.getElements();
 
         writer.startElement("div", menu);
         writer.writeAttribute("id", clientId, null);
@@ -62,10 +63,12 @@ public class TabMenuRenderer extends BaseMenuRenderer {
 
         int i = 0;
         if (elements != null && !elements.isEmpty()) {
-            for (MenuElement element : elements) {
-                if (element.isRendered() && (element instanceof MenuItem)) {
-                    encodeItem(context, menu, (MenuItem) element, (i == activeIndex));
-                    i++;
+            for (Object element : elements) {
+                if (element instanceof MenuElement) {
+                    if (((MenuElement) element).isRendered() && (element instanceof MenuItem)) {
+                        encodeItem(context, menu, (MenuItem) element, (i == activeIndex));
+                        i++;
+                    }
                 }
             }
         }
@@ -92,8 +95,8 @@ public class TabMenuRenderer extends BaseMenuRenderer {
         writer.startElement("li", null);
         writer.writeAttribute("class", containerClass, null);
         writer.writeAttribute("role", "tab", null);
-        writer.writeAttribute("aria-expanded", String.valueOf(active), null);
-        writer.writeAttribute("aria-selected", String.valueOf(active), null);
+        writer.writeAttribute(HTML.ARIA_EXPANDED, String.valueOf(active), null);
+        writer.writeAttribute(HTML.ARIA_SELECTED, String.valueOf(active), null);
 
         if (containerStyle != null) {
             writer.writeAttribute("style", containerStyle, null);

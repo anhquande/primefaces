@@ -27,7 +27,7 @@ PrimeFaces.widget.SelectManyMenu = PrimeFaces.widget.SelectListbox.extend({
                 unchanged = (!metaKey && selectedItems.length === 1 && selectedItems.index() === item.index());
 
                 if(!e.shiftKey) {
-                    if(!metaKey) {
+                    if(!metaKey && !$this.cfg.showCheckbox) {
                         $this.unselectAll();
                     }
 
@@ -99,9 +99,65 @@ PrimeFaces.widget.SelectManyMenu = PrimeFaces.widget.SelectListbox.extend({
         }
     },
 
-    unselectAll: function() {
+    selectAll: function() {
+        // ~~~ PERF ~~~
+        // See https://github.com/primefaces/primefaces/issues/2089
+        //
+        // 1) don't use jquery wrappers
+        // 2) don't use existing methods like selectItem
+
         for(var i = 0; i < this.items.length; i++) {
-            this.unselectItem(this.items.eq(i));
+            var item = this.items.eq(i);
+            var itemNative = item[0];
+
+            itemNative.classList.add('ui-state-highlight');
+            itemNative.classList.remove('ui-state-hover');
+
+            if(this.cfg.showCheckbox) {
+                var checkbox = item.children('div.ui-chkbox').children('div.ui-chkbox-box');
+
+                var checkboxNative = checkbox[0];
+                checkboxNative.classList.remove('ui-state-hover');
+                checkboxNative.classList.add('ui-state-active');
+
+                var checkboxIconNative = checkbox.children('span.ui-chkbox-icon')[0];
+                checkboxIconNative.classList.remove('ui-icon-blank');
+                checkboxIconNative.classList.add('ui-icon-check');
+            }
+        }
+
+        for(var i = 0; i < this.options.length; i++) {
+            this.options[i].setAttribute('selected', true);
+        }
+    },
+
+    unselectAll: function() {
+        // ~~~ PERF ~~~
+        // See https://github.com/primefaces/primefaces/issues/2089
+        //
+        // 1) don't use jquery wrappers
+        // 2) don't use existing methods like unselectItem
+
+        for(var i = 0; i < this.items.length; i++) {
+            var item = this.items.eq(i);
+            var itemNative = item[0];
+
+            itemNative.classList.remove('ui-state-highlight');
+
+            if(this.cfg.showCheckbox) {
+                var checkbox = item.children('div.ui-chkbox').children('div.ui-chkbox-box');
+
+                var checkboxNative = checkbox[0];
+                checkboxNative.classList.remove('ui-state-active');
+
+                var checkboxIconNative = checkbox.children('span.ui-chkbox-icon')[0];
+                checkboxIconNative.classList.add('ui-icon-blank');
+                checkboxIconNative.classList.remove('ui-icon-check');
+            }
+        }
+
+        for(var i = 0; i < this.options.length; i++) {
+            this.options[i].removeAttribute('selected');
         }
     },
 

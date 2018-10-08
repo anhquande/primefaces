@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,11 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
+
 import org.primefaces.renderkit.CoreRenderer;
 import org.primefaces.util.WidgetBuilder;
 
@@ -76,7 +78,7 @@ public class GalleriaRenderer extends CoreRenderer {
             Map<String, Object> requestMap = context.getExternalContext().getRequestMap();
             Collection<?> value = (Collection<?>) galleria.getValue();
             if (value != null) {
-                for (Iterator<?> it = value.iterator(); it.hasNext();) {
+                for (Iterator<?> it = value.iterator(); it.hasNext(); ) {
                     requestMap.put(var, it.next());
 
                     writer.startElement("li", null);
@@ -108,7 +110,7 @@ public class GalleriaRenderer extends CoreRenderer {
         WidgetBuilder wb = getWidgetBuilder(context);
 
         if (context.isPostback()) {
-            wb.initWithDomReady("Galleria", galleria.resolveWidgetVar(), clientId);
+            wb.init("Galleria", galleria.resolveWidgetVar(), clientId);
         }
         else {
             wb.initWithWindowLoad("Galleria", galleria.resolveWidgetVar(), clientId);

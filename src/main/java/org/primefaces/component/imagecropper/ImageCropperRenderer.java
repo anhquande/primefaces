@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,31 +16,31 @@
 package org.primefaces.component.imagecropper;
 
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Map;
+import java.util.logging.Logger;
+
 import javax.el.ValueExpression;
 import javax.faces.application.Application;
 import javax.faces.application.Resource;
 import javax.faces.application.ResourceHandler;
-
 import javax.faces.component.UIComponent;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 import javax.faces.convert.ConverterException;
 import javax.imageio.ImageIO;
+import org.apache.commons.io.input.BoundedInputStream;
 
 import org.primefaces.model.CroppedImage;
 import org.primefaces.renderkit.CoreRenderer;
 import org.primefaces.util.WidgetBuilder;
 
 public class ImageCropperRenderer extends CoreRenderer {
+
+    private static final Logger LOGGER = Logger.getLogger(ImageCropperRenderer.class.getName());
 
     @Override
     public void decode(FacesContext context, UIComponent component) {
@@ -156,7 +156,7 @@ public class ImageCropperRenderer extends CoreRenderer {
 
         ImageCropper cropper = (ImageCropper) component;
         Resource resource = getImageResource(context, cropper);
-        InputStream inputStream;
+        InputStream inputStream = null;
         String imagePath = cropper.getImage();
         String contentType = null;
 
@@ -183,8 +183,22 @@ public class ImageCropperRenderer extends CoreRenderer {
                 }
             }
 
+            // wrap input stream by BoundedInputStream to prevent uncontrolled resource consumption (#3286)
+            if (cropper.getSizeLimit() != null) {
+                inputStream = new BoundedInputStream(inputStream, cropper.getSizeLimit());
+            }
+
             BufferedImage outputImage = ImageIO.read(inputStream);
-            inputStream.close();
+
+            // avoid java.awt.image.RasterFormatException: (x + width) is outside of Raster
+            // see #1208
+            if (x + w > outputImage.getWidth()) {
+                w = outputImage.getWidth() - x;
+            }
+            if (y + h > outputImage.getHeight()) {
+                h = outputImage.getHeight() - y;
+            }
+
             BufferedImage cropped = outputImage.getSubimage(x, y, w, h);
             ByteArrayOutputStream croppedOutImage = new ByteArrayOutputStream();
             String format = guessImageFormat(contentType, imagePath);
@@ -194,6 +208,16 @@ public class ImageCropperRenderer extends CoreRenderer {
         }
         catch (IOException e) {
             throw new ConverterException(e);
+        }
+        finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                }
+                catch (IOException e) {
+                    LOGGER.severe(e.getMessage());
+                }
+            }
         }
     }
 

@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package org.primefaces.component.dialog;
 
 import java.io.IOException;
-import java.util.logging.Logger;
 
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
@@ -25,12 +24,11 @@ import javax.faces.context.ResponseWriter;
 import org.primefaces.expression.SearchExpressionFacade;
 import org.primefaces.renderkit.CoreRenderer;
 import org.primefaces.util.ComponentUtils;
+import org.primefaces.util.HTML;
 import org.primefaces.util.MessageFactory;
 import org.primefaces.util.WidgetBuilder;
 
 public class DialogRenderer extends CoreRenderer {
-
-    private static final Logger LOG = Logger.getLogger(DialogRenderer.class.getName());
 
     @Override
     public void decode(FacesContext context, UIComponent component) {
@@ -53,7 +51,7 @@ public class DialogRenderer extends CoreRenderer {
     protected void encodeScript(FacesContext context, Dialog dialog) throws IOException {
         String clientId = dialog.getClientId(context);
         WidgetBuilder wb = getWidgetBuilder(context);
-        wb.initWithDomReady("Dialog", dialog.resolveWidgetVar(), clientId);
+        wb.init("Dialog", dialog.resolveWidgetVar(), clientId);
 
         wb.attr("visible", dialog.isVisible(), false)
                 .attr("draggable", dialog.isDraggable(), true)
@@ -187,6 +185,7 @@ public class DialogRenderer extends CoreRenderer {
 
         writer.startElement("div", null);
         writer.writeAttribute("class", Dialog.CONTENT_CLASS, null);
+        writer.writeAttribute("id", dialog.getClientId(context) + "_content", null);
 
         if (!dialog.isDynamic()) {
             renderChildren(context, dialog);
@@ -202,7 +201,7 @@ public class DialogRenderer extends CoreRenderer {
         writer.writeAttribute("href", "#", null);
         writer.writeAttribute("class", anchorClass, null);
         if (ariaLabel != null) {
-            writer.writeAttribute("aria-label", ariaLabel, null);
+            writer.writeAttribute(HTML.ARIA_LABEL, ariaLabel, null);
         }
 
         writer.startElement("span", null);

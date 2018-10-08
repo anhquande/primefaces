@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,14 +38,16 @@ public class LayoutRenderer extends CoreRenderer {
         Layout layout = (Layout) component;
         String clientId = layout.getClientId(context);
 
-        encodeScript(context, layout);
-
         if (layout.isElementLayout()) {
             writer.startElement("div", layout);
             writer.writeAttribute("id", clientId, "id");
 
-            if (layout.getStyle() != null) writer.writeAttribute("style", layout.getStyle(), "style");
-            if (layout.getStyleClass() != null) writer.writeAttribute("class", layout.getStyleClass(), "styleClass");
+            if (layout.getStyle() != null) {
+                writer.writeAttribute("style", layout.getStyle(), "style");
+            }
+            if (layout.getStyleClass() != null) {
+                writer.writeAttribute("class", layout.getStyleClass(), "styleClass");
+            }
         }
     }
 
@@ -57,12 +59,14 @@ public class LayoutRenderer extends CoreRenderer {
         if (layout.isElementLayout()) {
             writer.endElement("div");
         }
+
+        encodeScript(context, layout);
     }
 
     protected void encodeScript(FacesContext context, Layout layout) throws IOException {
         String clientId = layout.getClientId(context);
         WidgetBuilder wb = getWidgetBuilder(context);
-        wb.initWithDomReady("Layout", layout.resolveWidgetVar(), clientId)
+        wb.init("Layout", layout.resolveWidgetVar(), clientId)
                 .attr("full", layout.isFullPage(), false)
                 .attr("useStateCookie", layout.isStateful(), false);
 

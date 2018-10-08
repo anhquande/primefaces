@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,10 +89,12 @@ public class StateMachineConnector extends Connector {
         this.orientation = orientation;
     }
 
+    @Override
     public String getType() {
         return "StateMachine";
     }
 
+    @Override
     public String toJS(StringBuilder sb) {
         return sb.append("['StateMachine',{curviness:").append(curviness)
                 .append(",margin:").append(margin)

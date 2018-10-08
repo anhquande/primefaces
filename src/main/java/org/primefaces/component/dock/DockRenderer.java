@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,11 @@ import java.util.List;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
+
 import org.primefaces.component.menu.AbstractMenu;
 import org.primefaces.component.menu.BaseMenuRenderer;
 import org.primefaces.model.menu.MenuElement;
 import org.primefaces.model.menu.MenuItem;
-
 import org.primefaces.util.WidgetBuilder;
 
 public class DockRenderer extends BaseMenuRenderer {
@@ -56,6 +56,7 @@ public class DockRenderer extends BaseMenuRenderer {
         writer.startElement("div", null);
         writer.writeAttribute("id", clientId, null);
         writer.writeAttribute("class", "ui-dock-" + position + " ui-widget", "styleClass");
+        renderPassThruAttributes(context, dock, null);
 
         writer.startElement("div", null);
         writer.writeAttribute("class", "ui-dock-container-" + position + " ui-widget-header", null);
@@ -69,7 +70,7 @@ public class DockRenderer extends BaseMenuRenderer {
 
     protected void encodeMenuItems(FacesContext context, Dock dock) throws IOException {
         if (dock.getElementsCount() > 0) {
-            List<MenuElement> menuElements = (List<MenuElement>) dock.getElements();
+            List<MenuElement> menuElements = dock.getElements();
 
             for (MenuElement element : menuElements) {
                 if (element.isRendered() && element instanceof MenuItem) {
@@ -107,7 +108,12 @@ public class DockRenderer extends BaseMenuRenderer {
         writer.startElement("span", null);
 
         if (menuitem.getValue() != null) {
-            writer.write((String) menuitem.getValue());
+            if (menuitem.isEscape()) {
+                writer.writeText(menuitem.getValue(), "value");
+            }
+            else {
+                writer.write((String) menuitem.getValue());
+            }
         }
 
         writer.endElement("span");

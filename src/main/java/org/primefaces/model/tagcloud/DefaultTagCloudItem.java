@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ public class DefaultTagCloudItem implements TagCloudItem, Serializable {
         this.url = url;
     }
 
+    @Override
     public String getLabel() {
         return label;
     }
@@ -47,6 +48,7 @@ public class DefaultTagCloudItem implements TagCloudItem, Serializable {
         this.label = label;
     }
 
+    @Override
     public int getStrength() {
         return strength;
     }
@@ -55,6 +57,7 @@ public class DefaultTagCloudItem implements TagCloudItem, Serializable {
         this.strength = strength;
     }
 
+    @Override
     public String getUrl() {
         return url;
     }

@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,12 @@
 package org.primefaces.component.selectbooleanbutton;
 
 import java.io.IOException;
+
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 import javax.faces.convert.ConverterException;
-import org.primefaces.context.RequestContext;
+
 import org.primefaces.renderkit.InputRenderer;
 import org.primefaces.util.ComponentUtils;
 import org.primefaces.util.HTML;
@@ -32,14 +33,14 @@ public class SelectBooleanButtonRenderer extends InputRenderer {
     public void decode(FacesContext context, UIComponent component) {
         SelectBooleanButton button = (SelectBooleanButton) component;
 
-        if (button.isDisabled()) {
+        if (!shouldDecode(button)) {
             return;
         }
 
         decodeBehaviors(context, button);
 
         String clientId = button.getClientId(context);
-        String submittedValue = (String) context.getExternalContext().getRequestParameterMap().get(clientId + "_input");
+        String submittedValue = context.getExternalContext().getRequestParameterMap().get(clientId + "_input");
 
         if (submittedValue != null && submittedValue.equalsIgnoreCase("on")) {
             button.setSubmittedValue(true);
@@ -60,7 +61,7 @@ public class SelectBooleanButtonRenderer extends InputRenderer {
     protected void encodeMarkup(FacesContext context, SelectBooleanButton button) throws IOException {
         ResponseWriter writer = context.getResponseWriter();
         String clientId = button.getClientId(context);
-        boolean checked = Boolean.valueOf(ComponentUtils.getValueToRender(context, button));
+        boolean checked = Boolean.parseBoolean(ComponentUtils.getValueToRender(context, button));
         boolean disabled = button.isDisabled();
         String inputId = clientId + "_input";
         String label = checked ? button.getOnLabel() : button.getOffLabel();
@@ -69,14 +70,16 @@ public class SelectBooleanButtonRenderer extends InputRenderer {
         String style = button.getStyle();
         String styleClass = "ui-selectbooleanbutton " + button.resolveStyleClass(checked, disabled);
 
-        //button        
+        //button
         writer.startElement("div", null);
         writer.writeAttribute("id", clientId, "id");
-        writer.writeAttribute("type", "button", null);
-        writer.writeAttribute("class",styleClass, null);
-        if (disabled) writer.writeAttribute("disabled", "disabled", null);
-        if (title != null) writer.writeAttribute("title", title, null);
-        if (style != null) writer.writeAttribute("style", style, "style");
+        writer.writeAttribute("class", styleClass, null);
+        if (title != null) {
+            writer.writeAttribute("title", title, null);
+        }
+        if (style != null) {
+            writer.writeAttribute("style", style, "style");
+        }
 
         writer.startElement("div", null);
         writer.writeAttribute("class", "ui-helper-hidden-accessible", null);
@@ -87,20 +90,15 @@ public class SelectBooleanButtonRenderer extends InputRenderer {
         writer.writeAttribute("name", inputId, null);
         writer.writeAttribute("type", "checkbox", null);
 
-        if (checked) writer.writeAttribute("checked", "checked", null);
-        if (disabled) writer.writeAttribute("disabled", "disabled", null);
-
-        if (RequestContext.getCurrentInstance(context).getApplicationContext().getConfig().isClientSideValidationEnabled()) {
-            renderValidationMetadata(context, button);
+        if (checked) {
+            writer.writeAttribute("checked", "checked", null);
         }
 
+        renderValidationMetadata(context, button);
+        renderAccessibilityAttributes(context, button);
+        renderPassThruAttributes(context, button, HTML.TAB_INDEX);
         renderOnchange(context, button);
         renderDomEvents(context, button, HTML.BLUR_FOCUS_EVENTS);
-
-        // tabindex
-        if (button.getTabindex() != null) {
-            writer.writeAttribute("tabindex", button.getTabindex(), null);
-        }
 
         writer.endElement("input");
 
@@ -116,18 +114,29 @@ public class SelectBooleanButtonRenderer extends InputRenderer {
         //label
         writer.startElement("span", null);
         writer.writeAttribute("class", HTML.BUTTON_TEXT_CLASS, null);
-        writer.writeText(label, "value");
+
+        if (isValueBlank(label)) {
+            writer.write("ui-button");
+        }
+        else {
+            writer.writeText(label, "value");
+        }
+
         writer.endElement("span");
 
         writer.endElement("div");
     }
 
     protected void encodeScript(FacesContext context, SelectBooleanButton button) throws IOException {
+
+        String onLabel = button.getOnLabel();
+        String offLabel = button.getOffLabel();
+
         String clientId = button.getClientId(context);
         WidgetBuilder wb = getWidgetBuilder(context);
         wb.init("SelectBooleanButton", button.resolveWidgetVar(), clientId)
-                .attr("onLabel", escapeText(button.getOnLabel()))
-                .attr("offLabel", escapeText(button.getOffLabel()))
+                .attr("onLabel", isValueBlank(onLabel) ? "ui-button" : onLabel)
+                .attr("offLabel", isValueBlank(offLabel) ? "ui-button" : offLabel)
                 .attr("onIcon", button.getOnIcon(), null)
                 .attr("offIcon", button.getOffIcon(), null);
 

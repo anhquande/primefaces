@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,18 @@
  */
 package org.primefaces.component.timeline;
 
-import org.primefaces.renderkit.CoreRenderer;
+import java.io.IOException;
+import java.util.*;
 
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
-import java.io.IOException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
+
 import org.primefaces.model.timeline.TimelineEvent;
 import org.primefaces.model.timeline.TimelineGroup;
 import org.primefaces.model.timeline.TimelineModel;
-import org.primefaces.util.ComponentUtils;
-import org.primefaces.util.DateUtils;
-import org.primefaces.util.FastStringWriter;
+import org.primefaces.renderkit.CoreRenderer;
+import org.primefaces.util.*;
 
 public class TimelineRenderer extends CoreRenderer {
 
@@ -80,10 +74,9 @@ public class TimelineRenderer extends CoreRenderer {
         FastStringWriter fsw = new FastStringWriter();
         FastStringWriter fswHtml = new FastStringWriter();
 
-        startScript(writer, clientId);
-        writer.write("$(function(){");
-        writer.write("PrimeFaces.cw('Timeline','" + timeline.resolveWidgetVar() + "',{");
-        writer.write("id:'" + clientId + "'");
+        WidgetBuilder wb = getWidgetBuilder(context);
+        wb.init("Timeline", timeline.resolveWidgetVar(), clientId);
+
         writer.write(",data:[");
 
         Map<String, String> groupsContent = null;
@@ -91,7 +84,7 @@ public class TimelineRenderer extends CoreRenderer {
         UIComponent groupFacet = timeline.getFacet("group");
         if (groups != null && groupFacet != null) {
             // buffer for groups' content
-            groupsContent = new HashMap<String, String>();
+            groupsContent = new HashMap<>();
         }
 
         List<TimelineEvent> events = model.getEvents();
@@ -109,102 +102,101 @@ public class TimelineRenderer extends CoreRenderer {
 
         // encode options
         writer.write("height:'" + timeline.getHeight() + "'");
-        writer.write(",minHeight:" + timeline.getMinHeight());
-        writer.write(",width:'" + timeline.getWidth() + "'");
-        writer.write(",responsive:" + timeline.isResponsive());
-        writer.write(",axisOnTop:" + timeline.isAxisOnTop());
-        writer.write(",dragAreaWidth:" + timeline.getDragAreaWidth());
-        writer.write(",editable:" + timeline.isEditable());
-        writer.write(",selectable:" + timeline.isSelectable());
-        writer.write(",unselectable:" + timeline.isUnselectable());
-        writer.write(",zoomable:" + timeline.isZoomable());
-        writer.write(",moveable:" + timeline.isMoveable());
-        writer.write(",timeChangeable:" + timeline.isTimeChangeable());
+        wb.attr("minHeight", timeline.getMinHeight());
+        wb.attr("width", timeline.getWidth());
+        wb.attr("responsive", timeline.isResponsive());
+        wb.attr("axisOnTop", timeline.isAxisOnTop());
+        wb.attr("dragAreaWidth", timeline.getDragAreaWidth());
+        wb.attr("editable", timeline.isEditable());
+        wb.attr("selectable", timeline.isSelectable());
+        wb.attr("unselectable", timeline.isUnselectable());
+        wb.attr("zoomable", timeline.isZoomable());
+        wb.attr("moveable", timeline.isMoveable());
+        wb.attr("timeChangeable", timeline.isTimeChangeable());
 
         if (timeline.getStart() != null) {
-            writer.write(",start:" + encodeDate(browserTZ, targetTZ, timeline.getStart()));
+            wb.nativeAttr("start", encodeDate(browserTZ, targetTZ, timeline.getStart()));
         }
 
         if (timeline.getEnd() != null) {
-            writer.write(",end:" + encodeDate(browserTZ, targetTZ, timeline.getEnd()));
+            wb.nativeAttr("end", encodeDate(browserTZ, targetTZ, timeline.getEnd()));
         }
 
         if (timeline.getMin() != null) {
-            writer.write(",min:" + encodeDate(browserTZ, targetTZ, timeline.getMin()));
+            wb.nativeAttr("min", encodeDate(browserTZ, targetTZ, timeline.getMin()));
         }
 
         if (timeline.getMax() != null) {
-            writer.write(",max:" + encodeDate(browserTZ, targetTZ, timeline.getMax()));
+            wb.nativeAttr("max", encodeDate(browserTZ, targetTZ, timeline.getMax()));
         }
 
-        writer.write(",zoomMin:" + timeline.getZoomMin());
-        writer.write(",zoomMax:" + timeline.getZoomMax());
+        wb.attr("zoomMin", timeline.getZoomMin());
+        wb.attr("zoomMax", timeline.getZoomMax());
 
         if (timeline.getPreloadFactor() < 0) {
-            writer.write(",preloadFactor:0");
+            wb.attr("preloadFactor", 0);
         }
         else {
-            writer.write(",preloadFactor:" + timeline.getPreloadFactor());
+            wb.attr("preloadFactor", timeline.getPreloadFactor());
         }
 
-        writer.write(",eventMargin:" + timeline.getEventMargin());
-        writer.write(",eventMarginAxis:" + timeline.getEventMarginAxis());
-        writer.write(",style:'" + timeline.getEventStyle() + "'");
-        writer.write(",groupsChangeable:" + timeline.isGroupsChangeable());
-        writer.write(",groupsOnRight:" + timeline.isGroupsOnRight());
-        writer.write(",groupsOrder:" + timeline.isGroupsOrder());
-        writer.write(",groupMinHeight:" + timeline.getGroupMinHeight());
+        wb.attr("eventMargin", timeline.getEventMargin());
+        wb.attr("eventMarginAxis", timeline.getEventMarginAxis());
+        wb.attr("style", timeline.getEventStyle());
+        wb.attr("groupsChangeable", timeline.isGroupsChangeable());
+        wb.attr("groupsOnRight", timeline.isGroupsOnRight());
+        wb.attr("groupsOrder", timeline.isGroupsOrder());
+        wb.attr("groupMinHeight", timeline.getGroupMinHeight());
 
         if (timeline.getGroupsWidth() != null) {
-            writer.write(",groupsWidth:'" + timeline.getGroupsWidth() + "'");
+            wb.attr("groupsWidth", timeline.getGroupsWidth());
         }
 
-        writer.write(",snapEvents:" + timeline.isSnapEvents());
-        writer.write(",stackEvents:" + timeline.isStackEvents());
+        wb.attr("snapEvents", timeline.isSnapEvents());
+        wb.attr("stackEvents", timeline.isStackEvents());
 
-        writer.write(",showCurrentTime:" + timeline.isShowCurrentTime());
+        wb.attr("showCurrentTime", timeline.isShowCurrentTime());
         if (timeline.isShowCurrentTime()) {
-            writer.write(",currentTime:"
-                    + encodeDate(browserTZ, targetTZ, Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTime()));
+            wb.nativeAttr("currentTime", encodeDate(browserTZ, targetTZ, Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTime()));
         }
 
-        writer.write(",showMajorLabels:" + timeline.isShowMajorLabels());
-        writer.write(",showMinorLabels:" + timeline.isShowMinorLabels());
-        writer.write(",showButtonNew:" + timeline.isShowButtonNew());
-        writer.write(",showNavigation:" + timeline.isShowNavigation());
+        wb.attr("showMajorLabels", timeline.isShowMajorLabels());
+        wb.attr("showMinorLabels", timeline.isShowMinorLabels());
+        wb.attr("showButtonNew", timeline.isShowButtonNew());
+        wb.attr("showNavigation", timeline.isShowNavigation());
 
         if (timeline.getLocale() != null) {
-            writer.write(",locale:'" + timeline.getLocale().toString() + "'");
+            wb.attr("locale", timeline.getLocale().toString());
         }
 
         if (timeline.getDropHoverStyleClass() != null) {
-            writer.write(",hoverClass:'" + timeline.getDropHoverStyleClass() + "'");
+            wb.attr("hoverClass", timeline.getDropHoverStyleClass());
         }
 
         if (timeline.getDropActiveStyleClass() != null) {
-            writer.write(",activeClass:'" + timeline.getDropActiveStyleClass() + "'");
+            wb.attr("activeClass", timeline.getDropActiveStyleClass());
         }
 
         if (timeline.getDropAccept() != null) {
-            writer.write(",accept:'" + timeline.getDropAccept() + "'");
+            wb.attr("accept", timeline.getDropAccept());
         }
 
         if (timeline.getDropScope() != null) {
-            writer.write(",scope:'" + timeline.getDropScope() + "'");
+            wb.attr("scope", timeline.getDropScope());
         }
 
-        writer.write(",animate:" + timeline.isAnimate());
-        writer.write(",animateZoom:" + timeline.isAnimateZoom());
+        wb.attr("animate", timeline.isAnimate());
+        wb.attr("animateZoom", timeline.isAnimateZoom());
 
         writer.write("}");
         encodeClientBehaviors(context, timeline);
-        writer.write("},true);});");
-        endScript(writer);
+
+        wb.finish();
     }
 
     public String encodeEvent(FacesContext context, FastStringWriter fsw, FastStringWriter fswHtml, Timeline timeline,
-            TimeZone browserTZ, TimeZone targetTZ, List<TimelineGroup> groups, UIComponent groupFacet,
-            Map<String, String> groupsContent, TimelineEvent event) throws IOException {
+                              TimeZone browserTZ, TimeZone targetTZ, List<TimelineGroup> groups, UIComponent groupFacet,
+                              Map<String, String> groupsContent, TimelineEvent event) throws IOException {
         ResponseWriter writer = context.getResponseWriter();
 
         fsw.write("{\"start\":" + encodeDate(browserTZ, targetTZ, event.getStartDate()));
@@ -259,7 +251,7 @@ public class TimelineRenderer extends CoreRenderer {
                     }
                     else {
                         Object data = foundGroup.getData();
-                        if (!ComponentUtils.isValueBlank(timeline.getVarGroup()) && data != null) {
+                        if (!LangUtils.isValueBlank(timeline.getVarGroup()) && data != null) {
                             context.getExternalContext().getRequestMap().put(timeline.getVarGroup(), data);
                         }
 
@@ -271,7 +263,7 @@ public class TimelineRenderer extends CoreRenderer {
                         // restore writer
                         context.setResponseWriter(writer);
                         // extract the content of the group, first buffer and then render it
-                        groupsContent.put(foundGroup.getId(), prefix + escapeText(fswHtml.toString()));
+                        groupsContent.put(foundGroup.getId(), prefix + EscapeUtils.forJavaScript(fswHtml.toString()));
                         fsw.write(",\"group\":\"" + groupsContent.get(foundGroup.getId()) + "\"");
                         fswHtml.reset();
                     }
@@ -296,7 +288,7 @@ public class TimelineRenderer extends CoreRenderer {
             }
         }
 
-        if (!ComponentUtils.isValueBlank(event.getStyleClass())) {
+        if (!LangUtils.isValueBlank(event.getStyleClass())) {
             fsw.write(",\"className\":\"" + event.getStyleClass() + "\"");
         }
         else {
@@ -306,7 +298,7 @@ public class TimelineRenderer extends CoreRenderer {
         fsw.write(",\"content\":\"");
         if (timeline.getChildCount() > 0) {
             Object data = event.getData();
-            if (!ComponentUtils.isValueBlank(timeline.getVar()) && data != null) {
+            if (!LangUtils.isValueBlank(timeline.getVar()) && data != null) {
                 context.getExternalContext().getRequestMap().put(timeline.getVar(), data);
             }
 
@@ -318,7 +310,7 @@ public class TimelineRenderer extends CoreRenderer {
             // restore writer
             context.setResponseWriter(writer);
             // extract the content of the event
-            fsw.write(escapeText(fswHtml.toString()));
+            fsw.write(EscapeUtils.forJavaScript(fswHtml.toString()));
             fswHtml.reset();
         }
         else if (event.getData() != null) {

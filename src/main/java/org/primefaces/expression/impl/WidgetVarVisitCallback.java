@@ -1,5 +1,5 @@
 /**
- * Copyright 2009-2017 PrimeTek.
+ * Copyright 2009-2018 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ public class WidgetVarVisitCallback implements VisitCallback {
         this.component = null;
     }
 
+    @Override
     public VisitResult visit(VisitContext context, UIComponent target) {
 
         if (target instanceof Widget) {
