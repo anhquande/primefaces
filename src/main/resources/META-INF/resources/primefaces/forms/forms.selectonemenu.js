@@ -986,7 +986,7 @@ PrimeFaces.widget.SelectOneMenu = PrimeFaces.widget.DeferredWidget.extend({
         
         if(dialog.length == 1) {
             //set position as fixed to scroll with dialog
-            this.panel.css('position', 'fixed');
+            this.panel.css('position', 'absolute'); //@author anhquande: position must be 'absolute', when 'fixed', it causes broken layout in dialog
 
             //append to body if not already appended by user choice
             if(!this.panel.parent().is(document.body)) {
