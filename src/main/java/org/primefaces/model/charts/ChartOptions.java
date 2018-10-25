@@ -16,6 +16,7 @@
 package org.primefaces.model.charts;
 
 import org.primefaces.model.charts.optionconfig.elements.Elements;
+import org.primefaces.model.charts.optionconfig.legend.Legend;
 import org.primefaces.model.charts.optionconfig.title.Title;
 import org.primefaces.model.charts.optionconfig.tooltip.Tooltip;
 
@@ -24,6 +25,7 @@ public abstract class ChartOptions {
     private Elements elements;
     private Title title;
     private Tooltip tooltip;
+    private Legend legend;
 
     public Elements getElements() {
         return elements;
@@ -47,5 +49,13 @@ public abstract class ChartOptions {
 
     public void setTooltip(Tooltip tooltip) {
         this.tooltip = tooltip;
+    }
+
+    public Legend getLegend() {
+        return legend;
+    }
+
+    public void setLegend(Legend legend) {
+        this.legend = legend;
     }
 }
