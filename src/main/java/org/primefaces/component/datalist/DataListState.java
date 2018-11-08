@@ -13,23 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.primefaces.model.menu;
+package org.primefaces.component.datalist;
 
-public interface Submenu extends MenuGroup {
+import java.io.Serializable;
 
-    public String getStyle();
+public class DataListState implements Serializable {
 
-    public String getStyleClass();
+    private int first;
 
-    public String getIcon();
+    private int rows;
 
-    public String getLabel();
+    public int getFirst() {
+        return first;
+    }
 
-    public boolean isDisabled();
+    public void setFirst(int first) {
+        this.first = first;
+    }
 
-    public Object getParent();
+    public int getRows() {
+        return rows;
+    }
 
-    public String getClientId();
-
-    public boolean isExpanded();
+    public void setRows(int rows) {
+        this.rows = rows;
+    }
 }

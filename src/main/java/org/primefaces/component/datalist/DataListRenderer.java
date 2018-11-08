@@ -49,8 +49,25 @@ public class DataListRenderer extends DataRenderer {
             else {
                 encodeStrictList(context, list);
             }
+
+            if (list.isMultiViewState()) {
+                DataListState ls = list.getDataListState(true);
+                ls.setFirst(list.getFirst());
+                ls.setRows(list.getRows());
+            }
         }
         else {
+            if (list.isMultiViewState() && list.isPaginator()) {
+                int firstOld = list.getFirst();
+                int rowsOld = list.getRows();
+
+                list.restoreDataListState();
+
+                if (list.isLazy() && (firstOld != list.getFirst() || rowsOld != list.getRows())) {
+                    list.loadLazyData();
+                }
+            }
+
             encodeMarkup(context, list);
             encodeScript(context, list);
         }
@@ -92,7 +109,7 @@ public class DataListRenderer extends DataRenderer {
 
         if (empty) {
             writer.startElement("div", list);
-            writer.writeAttribute("class", DataList.DATALIST_EMPTYMESSAGE_CLASS, null);
+            writer.writeAttribute("class", DataList.DATALIST_EMPTY_MESSAGE_CLASS, null);
             writer.writeText(list.getEmptyMessage(), "emptyMessage");
             writer.endElement("div");
         }

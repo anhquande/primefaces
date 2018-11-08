@@ -113,6 +113,17 @@ public class ScheduleRenderer extends CoreRenderer {
                 jsonObject.put("url", event.getUrl());
                 jsonObject.put("rendering", event.getRenderingMode());
 
+                if (event.getDynamicProperties() != null) {
+                    for (Map.Entry<String, Object> dynaProperty : event.getDynamicProperties().entrySet()) {
+                        String key = dynaProperty.getKey();
+                        Object value = dynaProperty.getValue();
+                        if (value instanceof Date) {
+                            value = iso.format((Date) value);
+                        }
+                        jsonObject.put(key, value);
+                    }
+                }
+
                 jsonEvents.put(jsonObject);
             }
         }
@@ -198,7 +209,8 @@ public class ScheduleRenderer extends CoreRenderer {
                 .attr("weekNumbers", isShowWeekNumbers, false)
                 .attr("nextDayThreshold", schedule.getNextDayThreshold(), "09:00:00")
                 .attr("slotEventOverlap", schedule.isSlotEventOverlap(), true)
-                .attr("urlTarget", schedule.getUrlTarget(), "_blank");
+                .attr("urlTarget", schedule.getUrlTarget(), "_blank")
+                .attr("noOpener", schedule.isNoOpener(), true);
 
         String columnFormat = schedule.getColumnFormat();
         if (columnFormat != null) {

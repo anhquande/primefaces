@@ -5257,6 +5257,12 @@
             <required>false</required>
             <type>java.lang.Boolean</type>
         </attribute>
+        <attribute>
+            <description><![CDATA[Whether to keep list state across views, defaults to false.]]></description>
+            <name>multiViewState</name>
+            <required>false</required>
+            <type>java.lang.Boolean</type>
+        </attribute>
     </tag>
     <tag>
         <tag-name>dataScroller</tag-name>
@@ -15598,6 +15604,12 @@
             <required>false</required>
             <type>java.lang.String</type>
         </attribute>
+        <attribute>
+            <description><![CDATA[Whether for URL events access to the opener window from the target site should be prevented (phishing protection), default value is true.]]></description>
+            <name>noOpener</name>
+            <required>false</required>
+            <type>java.lang.Boolean</type>
+        </attribute>
     </tag>
     <tag>
         <tag-name>scrollPanel</tag-name>
@@ -18830,6 +18842,12 @@
             <name>label</name>
             <required>false</required>
             <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description><![CDATA[Disables or enables the submenu.]]></description>
+            <name>disabled</name>
+            <required>false</required>
+            <type>java.lang.Boolean</type>
         </attribute>
         <attribute>
             <description><![CDATA[Icon of a submenu, see menuitem to see how it is used.]]></description>

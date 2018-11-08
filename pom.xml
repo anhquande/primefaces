@@ -196,6 +196,12 @@
             <version>2.7.4</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <version>3.0.2</version>
+            <scope>provided</scope>
+        </dependency>
 
         <!-- will be included and relocated by shade plugin -->
         <dependency>
@@ -757,6 +763,10 @@
                                     javax.enterprise;resolution:=optional,
                                     javax.enterprise.*;resolution:=optional,
                                     javax.validation.executable;resolution:=optional,
+                                    javax.servlet;version="[3,5)",
+                                    javax.servlet.annotation;version="[3,5)",
+                                    javax.servlet.descriptor;version="[3,5)",
+                                    javax.servlet.http;version="[3,5)",
                                     javax.*,
                                     net.glxn.qrgen;resolution:=optional,
                                     org.krysalis.barcode4j.output;resolution:=optional,
