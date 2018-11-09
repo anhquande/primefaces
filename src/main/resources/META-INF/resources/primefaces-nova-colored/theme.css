@@ -216,6 +216,7 @@ body .ui-autocomplete {
       body .ui-autocomplete .ui-autocomplete-multiple-container .ui-autocomplete-input-token input {
         font-family: "Open Sans", "Helvetica Neue", sans-serif;
         font-size: 14px;
+        color: #333333;
         padding: 0;
         margin: 0; }
 body .ui-autocomplete-panel {
@@ -230,6 +231,9 @@ body .ui-autocomplete-panel {
     padding: 0;
     line-height: normal;
     border: 0 none; }
+    body .ui-autocomplete-panel .ui-autocomplete-items .ui-autocomplete-group {
+      color: #333333;
+      padding: 0.429em 0.857em 0.429em 0.4285em; }
     body .ui-autocomplete-panel .ui-autocomplete-items .ui-autocomplete-item {
       border: 0 none;
       margin: 0;
@@ -609,7 +613,8 @@ body .ui-selectonemenu-panel {
         background-color: #e02365;
         color: #ffffff; }
     body .ui-selectonemenu-panel .ui-selectonemenu-items .ui-selectonemenu-item-group {
-      padding: 0.429em 0.857em 0.429em 0.4285em; }
+      padding: 0.429em 0.857em 0.429em 0.4285em;
+      color: #333333; }
 body .ui-selectcheckboxmenu {
   vertical-align: initial;
   border: 1px solid #a6a6a6;
@@ -805,6 +810,9 @@ body .ui-selectcheckboxmenu-panel {
           content: ""; }
   body .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-items {
     padding: 0; }
+    body .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-items .ui-selectcheckboxmenu-item-group {
+      color: #333333;
+      padding: 0.429em 0.857em 0.429em 0.4285em; }
     body .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-items .ui-selectcheckboxmenu-item {
       padding: 0.429em 0.857em;
       margin: 0;
@@ -866,6 +874,7 @@ body .ui-chips .ui-chips-container {
     body .ui-chips .ui-chips-container .ui-chips-input-token input {
       font-family: "Open Sans", "Helvetica Neue", sans-serif;
       font-size: 14px;
+      color: #333333;
       padding: 0;
       margin: 0; }
 body .ui-inplace .ui-inplace-display {
@@ -1378,6 +1387,7 @@ body .ui-toggleswitch {
     background-color: #116fbf; }
   body .ui-toggleswitch.ui-toggleswitch-checked.ui-toggleswitch-focus .ui-toggleswitch-slider {
     background: #005b9f; }
+body #keypad-div,
 body .keypad-popup {
   background-color: #ffffff;
   color: #333333;
@@ -1389,40 +1399,72 @@ body .keypad-popup {
   -webkit-box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.16);
   -moz-box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.16);
   box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.16); }
+  body #keypad-div .keypad-space,
   body .keypad-popup .keypad-space {
     margin: 1px;
     width: 2em; }
+  body #keypad-div .keypad-half-space,
   body .keypad-popup .keypad-half-space {
     margin-left: 0.5px;
-    margin-right: 0.5px; }
+    margin-right: 0.5px;
+    width: 1em;
+    margin: 0.125em 0.0625em; }
+  body #keypad-div button,
   body .keypad-popup button {
     background-color: #ffffff;
     border: 1px solid transparent;
     padding: 0.429em;
     margin: 1px;
     outline: 0 none; }
+    body #keypad-div button.keypad-key,
     body .keypad-popup button.keypad-key {
       width: 2em; }
+    body #keypad-div button.keypad-shift, body #keypad-div button.keypad-spacebar, body #keypad-div button.keypad-enter, body #keypad-div button.keypad-clear, body #keypad-div button.keypad-back, body #keypad-div button.keypad-close, body #keypad-div button.keypad-tab, body #keypad-div button.keypad-special,
+    body .keypad-popup button.keypad-shift,
+    body .keypad-popup button.keypad-spacebar,
+    body .keypad-popup button.keypad-enter,
+    body .keypad-popup button.keypad-clear,
+    body .keypad-popup button.keypad-back,
+    body .keypad-popup button.keypad-close,
+    body .keypad-popup button.keypad-tab,
     body .keypad-popup button.keypad-special {
       width: calc(4em + 2px); }
+    body #keypad-div button.keypad-spacebar,
     body .keypad-popup button.keypad-spacebar {
       width: calc(12em + 10px); }
+    body #keypad-div button.keypad-tab,
     body .keypad-popup button.keypad-tab {
       width: 2em; }
+    body #keypad-div button.ui-state-hover,
     body .keypad-popup button.ui-state-hover {
       background-color: #eaeaea;
       border: 1px solid transparent;
       color: #333333; }
+    body #keypad-div button.ui-state-active,
     body .keypad-popup button.ui-state-active {
       background-color: #007ad9;
       border: 1px solid #007ad9;
       color: #ffffff; }
-    body .keypad-popup button.keypad-shift, body .keypad-popup button.keypad-spacebar, body .keypad-popup button.keypad-enter, body .keypad-popup button.keypad-clear, body .keypad-popup button.keypad-back, body .keypad-popup button.keypad-close, body .keypad-popup button.keypad-tab {
+    body #keypad-div button.keypad-shift, body #keypad-div button.keypad-spacebar, body #keypad-div button.keypad-enter, body #keypad-div button.keypad-clear, body #keypad-div button.keypad-back, body #keypad-div button.keypad-close, body #keypad-div button.keypad-tab,
+    body .keypad-popup button.keypad-shift,
+    body .keypad-popup button.keypad-spacebar,
+    body .keypad-popup button.keypad-enter,
+    body .keypad-popup button.keypad-clear,
+    body .keypad-popup button.keypad-back,
+    body .keypad-popup button.keypad-close,
+    body .keypad-popup button.keypad-tab {
       background-color: #007ad9;
       border: 1px solid transparent;
       color: #ffffff;
       font-weight: 700; }
-      body .keypad-popup button.keypad-shift.ui-state-hover, body .keypad-popup button.keypad-spacebar.ui-state-hover, body .keypad-popup button.keypad-enter.ui-state-hover, body .keypad-popup button.keypad-clear.ui-state-hover, body .keypad-popup button.keypad-back.ui-state-hover, body .keypad-popup button.keypad-close.ui-state-hover, body .keypad-popup button.keypad-tab.ui-state-hover {
+      body #keypad-div button.keypad-shift.ui-state-hover, body #keypad-div button.keypad-spacebar.ui-state-hover, body #keypad-div button.keypad-enter.ui-state-hover, body #keypad-div button.keypad-clear.ui-state-hover, body #keypad-div button.keypad-back.ui-state-hover, body #keypad-div button.keypad-close.ui-state-hover, body #keypad-div button.keypad-tab.ui-state-hover,
+      body .keypad-popup button.keypad-shift.ui-state-hover,
+      body .keypad-popup button.keypad-spacebar.ui-state-hover,
+      body .keypad-popup button.keypad-enter.ui-state-hover,
+      body .keypad-popup button.keypad-clear.ui-state-hover,
+      body .keypad-popup button.keypad-back.ui-state-hover,
+      body .keypad-popup button.keypad-close.ui-state-hover,
+      body .keypad-popup button.keypad-tab.ui-state-hover {
         background-color: #005b9f;
         border: 1px solid transparent;
         color: #ffffff; }
@@ -1599,6 +1641,58 @@ body .ui-inputgroup .ui-inputgroup-addon {
     left: 50%;
     margin-top: -0.5em;
     margin-left: -0.5em; }
+body .ui-texteditor .ui-editor-toolbar {
+  border: 1px solid #007ad9;
+  background-color: #007ad9; }
+body .ui-texteditor .ql-container {
+  border: 1px solid #c8c8c8; }
+  body .ui-texteditor .ql-container .ql-editor {
+    background-color: #ffffff;
+    color: #333333; }
+body .ui-texteditor .ql-picker.ql-expanded .ql-picker-label {
+  color: #ffffff; }
+body .ui-texteditor .ql-stroke {
+  stroke: #ffffff; }
+body .ui-texteditor .ql-picker-label {
+  color: #ffffff; }
+body .ui-texteditor .ql-snow.ql-toolbar button:hover,
+body .ui-texteditor .ql-snow .ql-toolbar button:hover,
+body .ui-texteditor .ql-snow.ql-toolbar button.ql-active,
+body .ui-texteditor .ql-snow .ql-toolbar button.ql-active,
+body .ui-texteditor .ql-snow.ql-toolbar .ql-picker-label:hover,
+body .ui-texteditor .ql-snow .ql-toolbar .ql-picker-label:hover,
+body .ui-texteditor .ql-snow.ql-toolbar .ql-picker-label.ql-active,
+body .ui-texteditor .ql-snow .ql-toolbar .ql-picker-label.ql-active,
+body .ui-texteditor .ql-snow.ql-toolbar .ql-picker-item:hover,
+body .ui-texteditor .ql-snow .ql-toolbar .ql-picker-item:hover,
+body .ui-texteditor .ql-snow.ql-toolbar .ql-picker-item.ql-selected,
+body .ui-texteditor .ql-snow .ql-toolbar .ql-picker-item.ql-selected {
+  color: #5ab7ff; }
+body .ui-texteditor .ql-snow.ql-toolbar button:hover .ql-stroke,
+body .ui-texteditor .ql-snow .ql-toolbar button:hover .ql-stroke,
+body .ui-texteditor .ql-snow.ql-toolbar button.ql-active .ql-stroke,
+body .ui-texteditor .ql-snow .ql-toolbar button.ql-active .ql-stroke,
+body .ui-texteditor .ql-snow.ql-toolbar .ql-picker-label:hover .ql-stroke,
+body .ui-texteditor .ql-snow .ql-toolbar .ql-picker-label:hover .ql-stroke,
+body .ui-texteditor .ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke,
+body .ui-texteditor .ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-stroke,
+body .ui-texteditor .ql-snow.ql-toolbar .ql-picker-item:hover .ql-stroke,
+body .ui-texteditor .ql-snow .ql-toolbar .ql-picker-item:hover .ql-stroke,
+body .ui-texteditor .ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke,
+body .ui-texteditor .ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke,
+body .ui-texteditor .ql-snow.ql-toolbar button:hover .ql-stroke-miter,
+body .ui-texteditor .ql-snow .ql-toolbar button:hover .ql-stroke-miter,
+body .ui-texteditor .ql-snow.ql-toolbar button.ql-active .ql-stroke-miter,
+body .ui-texteditor .ql-snow .ql-toolbar button.ql-active .ql-stroke-miter,
+body .ui-texteditor .ql-snow.ql-toolbar .ql-picker-label:hover .ql-stroke-miter,
+body .ui-texteditor .ql-snow .ql-toolbar .ql-picker-label:hover .ql-stroke-miter,
+body .ui-texteditor .ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke-miter,
+body .ui-texteditor .ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-stroke-miter,
+body .ui-texteditor .ql-snow.ql-toolbar .ql-picker-item:hover .ql-stroke-miter,
+body .ui-texteditor .ql-snow .ql-toolbar .ql-picker-item:hover .ql-stroke-miter,
+body .ui-texteditor .ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke-miter,
+body .ui-texteditor .ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke-miter {
+  stroke: #5ab7ff; }
 
 body .ui-button {
   background-color: #007ad9;
@@ -2451,7 +2545,12 @@ body .ui-wizard .ui-wizard-navbar .ui-wizard-nav-back .ui-icon-arrowthick-1-w {
   body .ui-wizard .ui-wizard-navbar .ui-wizard-nav-back .ui-icon-arrowthick-1-w:before {
     content: ""; }
 body .ui-layout-unit {
-  border: 1px solid #c8c8c8; }
+  border: 1px solid #c8c8c8;
+  background-color: #ffffff;
+  color: #333333;
+  -moz-border-radius: 0;
+  -webkit-border-radius: 0;
+  border-radius: 0; }
   body .ui-layout-unit .ui-layout-unit-header {
     border: 1px solid #007ad9;
     background-color: #007ad9;
@@ -2459,10 +2558,7 @@ body .ui-layout-unit {
     padding: 0.571em 1em 0.571em 1em;
     font-weight: 400; }
     body .ui-layout-unit .ui-layout-unit-header .ui-icon {
-      color: #ffffff;
-      position: relative;
-      top: 0.5em;
-      right: 0.5em; }
+      color: #ffffff; }
       body .ui-layout-unit .ui-layout-unit-header .ui-icon.ui-icon-close {
         font-family: 'primeicons';
         speak: none;
@@ -2537,6 +2633,10 @@ body .ui-layout-unit {
         font-size: 1.25em; }
         body .ui-layout-unit .ui-layout-unit-header .ui-icon.ui-icon-triangle-1-n:before {
           content: ""; }
+    body .ui-layout-unit .ui-layout-unit-header .ui-layout-unit-header-icon.ui-state-hover .ui-icon {
+      color: #5ab7ff; }
+body .ui-layout-resizer {
+  background-color: #c8c8c8; }
 body .ui-ribbon .ui-tabs-panels .ui-tabs-panel {
   padding: 0; }
   body .ui-ribbon .ui-tabs-panels .ui-tabs-panel .ui-ribbon-groups {
@@ -3661,7 +3761,7 @@ body .ui-treetable .ui-treetable-data > tr {
   color: #333333;
   border: 1px solid #c8c8c8; }
   body .ui-treetable .ui-treetable-data > tr > td {
-    padding: calc(0.571em - 1) 0.857em;
+    padding: calc(0.571em - 1px) 0.857em;
     border: inherit; }
     body .ui-treetable .ui-treetable-data > tr > td .ui-treetable-toggler {
       margin-right: 0.429em;
@@ -5800,120 +5900,120 @@ body .ui-log {
       transition: color 0.3s; }
       body .ui-log .ui-log-header .ui-log-button.ui-state-hover {
         color: #5ab7ff; }
-      body .ui-log .ui-log-header .ui-log-button .ui-icon-trash {
-        font-family: 'primeicons';
-        speak: none;
-        font-style: normal;
-        font-weight: normal;
-        font-variant: normal;
-        text-transform: none;
-        line-height: 1;
-        display: inline-block;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        text-indent: 0px !important;
-        text-align: center;
-        background: none;
-        display: inline-block;
-        font-size: 1.25em; }
-        body .ui-log .ui-log-header .ui-log-button .ui-icon-trash:before {
-          content: ""; }
-      body .ui-log .ui-log-header .ui-log-button .ui-icon-note {
-        font-family: 'primeicons';
-        speak: none;
-        font-style: normal;
-        font-weight: normal;
-        font-variant: normal;
-        text-transform: none;
-        line-height: 1;
-        display: inline-block;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        text-indent: 0px !important;
-        text-align: center;
-        background: none;
-        display: inline-block;
-        font-size: 1.25em; }
-        body .ui-log .ui-log-header .ui-log-button .ui-icon-note:before {
-          content: ""; }
-      body .ui-log .ui-log-header .ui-log-button .ui-icon-info {
-        font-family: 'primeicons';
-        speak: none;
-        font-style: normal;
-        font-weight: normal;
-        font-variant: normal;
-        text-transform: none;
-        line-height: 1;
-        display: inline-block;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        text-indent: 0px !important;
-        text-align: center;
-        background: none;
-        display: inline-block;
-        font-size: 1.25em; }
-        body .ui-log .ui-log-header .ui-log-button .ui-icon-info:before {
-          content: ""; }
-      body .ui-log .ui-log-header .ui-log-button .ui-icon-notice {
-        font-family: 'primeicons';
-        speak: none;
-        font-style: normal;
-        font-weight: normal;
-        font-variant: normal;
-        text-transform: none;
-        line-height: 1;
-        display: inline-block;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        text-indent: 0px !important;
-        text-align: center;
-        background: none;
-        display: inline-block;
-        font-size: 1.25em; }
-        body .ui-log .ui-log-header .ui-log-button .ui-icon-notice:before {
-          content: ""; }
-      body .ui-log .ui-log-header .ui-log-button .ui-icon-search {
-        font-family: 'primeicons';
-        speak: none;
-        font-style: normal;
-        font-weight: normal;
-        font-variant: normal;
-        text-transform: none;
-        line-height: 1;
-        display: inline-block;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        text-indent: 0px !important;
-        text-align: center;
-        background: none;
-        display: inline-block;
-        font-size: 1.25em; }
-        body .ui-log .ui-log-header .ui-log-button .ui-icon-search:before {
-          content: ""; }
-      body .ui-log .ui-log-header .ui-log-button .ui-icon-alert {
-        font-family: 'primeicons';
-        speak: none;
-        font-style: normal;
-        font-weight: normal;
-        font-variant: normal;
-        text-transform: none;
-        line-height: 1;
-        display: inline-block;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        text-indent: 0px !important;
-        text-align: center;
-        background: none;
-        display: inline-block;
-        font-size: 1.25em; }
-        body .ui-log .ui-log-header .ui-log-button .ui-icon-alert:before {
-          content: ""; }
   body .ui-log .ui-log-content {
     background-color: #ffffff;
     color: #333333;
     border: 1px solid #c8c8c8;
     padding: 0.571em 1em;
     line-height: 1.5; }
+  body .ui-log .ui-icon-trash {
+    font-family: 'primeicons';
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    display: inline-block;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-indent: 0px !important;
+    text-align: center;
+    background: none;
+    display: inline-block;
+    font-size: 1.25em; }
+    body .ui-log .ui-icon-trash:before {
+      content: ""; }
+  body .ui-log .ui-icon-note {
+    font-family: 'primeicons';
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    display: inline-block;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-indent: 0px !important;
+    text-align: center;
+    background: none;
+    display: inline-block;
+    font-size: 1.25em; }
+    body .ui-log .ui-icon-note:before {
+      content: ""; }
+  body .ui-log .ui-icon-info {
+    font-family: 'primeicons';
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    display: inline-block;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-indent: 0px !important;
+    text-align: center;
+    background: none;
+    display: inline-block;
+    font-size: 1.25em; }
+    body .ui-log .ui-icon-info:before {
+      content: ""; }
+  body .ui-log .ui-icon-notice {
+    font-family: 'primeicons';
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    display: inline-block;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-indent: 0px !important;
+    text-align: center;
+    background: none;
+    display: inline-block;
+    font-size: 1.25em; }
+    body .ui-log .ui-icon-notice:before {
+      content: ""; }
+  body .ui-log .ui-icon-search {
+    font-family: 'primeicons';
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    display: inline-block;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-indent: 0px !important;
+    text-align: center;
+    background: none;
+    display: inline-block;
+    font-size: 1.25em; }
+    body .ui-log .ui-icon-search:before {
+      content: ""; }
+  body .ui-log .ui-icon-alert {
+    font-family: 'primeicons';
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    display: inline-block;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-indent: 0px !important;
+    text-align: center;
+    background: none;
+    display: inline-block;
+    font-size: 1.25em; }
+    body .ui-log .ui-icon-alert:before {
+      content: ""; }
 body .ui-terminal {
   background-color: #ffffff;
   color: #333333;
