@@ -154,7 +154,7 @@ public class SelectBooleanCheckboxRenderer extends InputRenderer {
         boolean hasItemLabel = !LangUtils.isValueBlank(itemLabel);
         boolean hasLabel = !LangUtils.isValueBlank(label);
 
-        if (hasItemLabel || hasLabel) {
+        if (!hasLabel && hasItemLabel) {
             ResponseWriter writer = context.getResponseWriter();
 
             writer.startElement("span", null);
