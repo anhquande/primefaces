@@ -15,12 +15,16 @@
  */
 package org.primefaces.model.charts;
 
+import java.io.Serializable;
+
 import org.primefaces.model.charts.optionconfig.elements.Elements;
 import org.primefaces.model.charts.optionconfig.legend.Legend;
 import org.primefaces.model.charts.optionconfig.title.Title;
 import org.primefaces.model.charts.optionconfig.tooltip.Tooltip;
 
-public abstract class ChartOptions {
+public abstract class ChartOptions implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private Elements elements;
     private Title title;
