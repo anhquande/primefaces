@@ -154,20 +154,24 @@ public class SelectBooleanCheckboxRenderer extends InputRenderer {
         boolean hasItemLabel = !LangUtils.isValueBlank(itemLabel);
         boolean hasLabel = !LangUtils.isValueBlank(label);
 
-        if (!hasLabel && hasItemLabel) {
+        if (hasItemLabel || hasLabel) {
             ResponseWriter writer = context.getResponseWriter();
 
             writer.startElement("span", null);
             writer.writeAttribute("class", HTML.CHECKBOX_LABEL_CLASS, null);
 
-            LOGGER.warning("itemLabel property is deprecated. Use label instead");
+            if (hasItemLabel) {
+                LOGGER.warning("itemLabel property is deprecated. Use label instead");
+            }
 
             boolean escaped = checkbox.isEscape();
+            String text = hasItemLabel ? itemLabel : label;
             if (escaped) {
-                writer.writeText(itemLabel, "itemLabel");
+                String property = hasItemLabel ? "itemLabel" : "label";
+                writer.writeText(text, property);
             }
             else {
-                writer.write(itemLabel);
+                writer.write(text);
             }
 
             writer.endElement("span");
