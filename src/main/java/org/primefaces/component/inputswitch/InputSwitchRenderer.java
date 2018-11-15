@@ -122,6 +122,7 @@ public class InputSwitchRenderer extends InputRenderer {
         writer.writeAttribute("id", inputId, "id");
         writer.writeAttribute("name", inputId, null);
         writer.writeAttribute("type", "checkbox", null);
+        writer.writeAttribute("class", "aysIgnore", null);  //TODO-anh: find better solution to mark the internal input field as aysIgnore
 
         if (checked) {
             writer.writeAttribute("checked", "checked", null);
