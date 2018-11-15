@@ -160,17 +160,14 @@ public class SelectBooleanCheckboxRenderer extends InputRenderer {
             writer.startElement("span", null);
             writer.writeAttribute("class", HTML.CHECKBOX_LABEL_CLASS, null);
 
-            if (hasItemLabel) {
-                LOGGER.warning("itemLabel property is deprecated. Use label instead");
-            }
+            LOGGER.warning("itemLabel property is deprecated. Use label instead");
 
             boolean escaped = checkbox.isEscape();
             if (escaped) {
-                String property = hasItemLabel ? "itemLabel" : "label";
-                writer.writeText(label, property);
+                writer.writeText(itemLabel, "itemLabel");
             }
             else {
-                writer.write(label);
+                writer.write(itemLabel);
             }
 
             writer.endElement("span");
