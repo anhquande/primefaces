@@ -157,6 +157,14 @@ public class DataList extends DataListBase {
         }
     }
 
+    /**
+     * This method is used by subclass of DataList to queue other ajax events than events provided by DataList
+     * @param event
+     */
+    protected void delegateEvent(FacesEvent event) {
+        super.queueEvent(event);
+    }
+
     @Override
     protected void processFacets(FacesContext context, PhaseId phaseId) {
         if (getFacetCount() > 0) {
